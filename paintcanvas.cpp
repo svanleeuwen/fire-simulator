@@ -1,4 +1,4 @@
-#define FRAMERATE 8
+#define FRAMERATE 10
 
 #include <QtGui>
 #include "paintcanvas.hpp"

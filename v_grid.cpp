@@ -26,8 +26,8 @@ void VGrid::advect(float dt)
     Grid u_copy(nx+1, ny, OUTER_VELOCITY);
     Grid v_copy(nx, ny+1, OUTER_VELOCITY);
 
-    advect(dt, Axis::U, u_copy);
-    advect(dt, Axis::V, v_copy);
+    advect(dt, Grid::Axis::X, u_copy);
+    advect(dt, Grid::Axis::Y, v_copy);
 
     u_ = std::move(u_copy);
     v_ = std::move(v_copy);
@@ -46,10 +46,10 @@ Vector2f VGrid::rk2(const Vector2f &x_g, const Vector2f &vel,
     return clamp_pos(x_g - dt * getVelocity(x_mid));
 }
 
-void VGrid::advect(float dt, Axis ax, Grid &ret)
+void VGrid::advect(float dt, Grid::Axis ax, Grid &ret)
 {
-    int width = m_nx + (ax == Axis::U);
-    int height = m_ny + (ax == Axis::V);
+    int width = m_nx + (ax == Grid::Axis::X);
+    int height = m_ny + (ax == Grid::Axis::Y);
 
     for(int i = PADDING_WIDTH; i < width - PADDING_WIDTH; ++i)
     {
@@ -63,11 +63,11 @@ void VGrid::advect(float dt, Axis ax, Grid &ret)
 
             switch(ax)
             {
-                case U:
+                case Grid::Axis::X:
                     ret[i][j] = getVelocityU(x_p);
                     break;
 
-                case V:
+                case Grid::Axis::Y:
                     ret[i][j] = getVelocityV(x_p);
                     break;
                

@@ -22,9 +22,7 @@ public:
     Grid v_;
 
 private:
-    enum Axis { U, V };
-    
-    void advect(float dt, Axis ax, Grid &ret);
+    void advect(float dt, Grid::Axis ax, Grid &ret);
     
     float getVelocityU(const Vector2f &x);
     float getVelocityV(const Vector2f &x);

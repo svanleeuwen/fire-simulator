@@ -2,18 +2,32 @@
 #define VIENNACL_WITH_EIGEN
 
 #define G -9.81f
-#define AMBIENT_TEMP 273.0f
-#define AIR_DENSITY 1.3f
+#define AMBIENT_TEMP 273.0f // degK
+#define AIR_DENSITY 1.3f // kg/m^3
 
 /* Guessed this value based on Figure 6 from 
  * "Effective Density Characterization of Soot
  * Agglomerates from Various Sources and
  * Comparison to Aggregation Theory"
+ *
+ * #define SOOT_DENSITY 400.0f // kg/m^3
+ * Need to really reduce density for this to work
+ *
  */
-#define SOOT_DENSITY 400.0f
 
-#define ALPHA 17.0f
-#define BETA 1.0f
+// From Nguyen 2002
+#define FLAME_DENSITY 0.05f // kg/m^3
+#define BURN_RATE 0.5f // m/s
+
+#define SOOT_DENSITY FLAME_DENSITY
+
+// alpha and beta have values from p.103 of Bridson
+#define ALPHA (SOOT_DENSITY - AIR_DENSITY) / AIR_DENSITY
+#define BETA 1.0f / AMBIENT_TEMP
+
+// Max temp from Wikipedia temp for candle flame
+#define MAX_TEMP 1673.0f
+#define IGNITION_TEMP 1000.0f
 
 #include "mac_grid.hpp"
 #include "viennacl/linalg/cg.hpp"
@@ -35,14 +49,24 @@ using Eigen::Vector4f;
 
 /* *********** Major Goals ****************
  *
- * TODO: First Fire Paper
- * TODO: Second Fire Paper
+ * TODO: Implement first fire paper
+ * TODO: Write goals for second fire paper
  *
  * TODO: Convert to 3D 
- *           - Vorticy Confinement (can't do it in 2D)
+ * TODO: Vorticy Confinement
  *
  * TODO: Set up GitHub repository
  * TODO: Put a .pdf of references in the code directory for github
+ *
+ */
+
+/************ Fire Goals ********************
+ * 
+ * TODO: Jump conditions (Bridson)
+ * TODO: Temperature decay (Bridson)
+ * TODO: Render flame
+ *          - First: Red and yellow
+ *          - Second: Blackbody radiation
  *
  */
 
@@ -62,10 +86,10 @@ using Eigen::Vector4f;
 /********** Optional smoke stuff ************
  *
  * TODO: Update cubic interpolator using Appendix B of Fedkiw or Bridson's course notes
- * TODO: Decay (maybe look to Fedkiw to see if this is used in theirs)
+ * TODO: Density Decay (probably don't do this)
  * TODO: Diffusion (p100 Bridson) (Look to viscous fluids if
- *you want to do this properly)
- * TODO: Variable Density (not necessary for the most part)
+ *       you want to do this properly)
+ * TODO: Variable Density (not necessary for the most part) <<<< Probably necessary for fire
  * TODO: Divergence solves (only needed if variable density is implemented)
  **
  */
@@ -79,7 +103,7 @@ void MacGrid::setTestValues()
         for(uint j = 2; j < m_press[0].size() - 2; ++j)
         {
             m_press[i][j] = 1;
-            m_mat[i][j] = Material::Fluid;
+            m_mat[i][j] = Material::Smoke;
         }
     }
 
@@ -101,8 +125,8 @@ void MacGrid::setTestValues()
         }
     }
 
-    m_src[(int)(m_nx / 2.0f)- 1][2] = true;
-    m_src[(int)(m_nx / 2.0f)][2] = true;
+//    m_src[(int)(m_nx / 2.0f) - 1][5] = true;
+//    m_src[(int)(m_nx / 2.0f)][5] = true;
 
     /*cout << "Initialized grids" << endl << endl;
     cout << "P :" << endl << m_press;
@@ -110,6 +134,15 @@ void MacGrid::setTestValues()
     cout << endl << "T :" << endl << m_temp;
     cout << endl << "S :" << endl << m_soot;
     cout << endl;*/
+}
+
+void MacGrid::setFuel()
+{
+    m_mat[(int)(m_nx / 2.0f) - 1][5] = Material::Fuel;
+    m_mat[(int)(m_nx / 2.0f)][5] = Material::Fuel;
+
+    m_temp[(int)(m_nx / 2.0f) - 1][5] = IGNITION_TEMP;
+    m_temp[(int)(m_nx / 2.0f)][5] = IGNITION_TEMP;
 }
 
 void MacGrid::testSolver()
@@ -142,7 +175,7 @@ MacGrid::MacGrid(int res, float dt) :
     m_nx = res + PADDING_WIDTH * 2;
     m_ny = res + PADDING_WIDTH * 2;
     m_dt = dt;
-    m_dx = 1.0 * 1.0f / res;
+    m_dx = 1.0f / res;
 
     m_mat.resize(m_nx);
     m_src.resize(m_nx);
@@ -189,14 +222,20 @@ float MacGrid::getDensity(int i, int j)
 
 void MacGrid::addSmoke()
 {
+    static int count = 0;
+    if(count++ > 500)
+    {
+        return;
+    }
+
     for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
     {
         for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
         {
             if(m_src[i][j])
             {
-                 m_temp[i][j] += 10.0f;
-                 m_soot[i][j] += 0.50f;
+                 m_temp[i][j] += 50.0f;
+                 m_soot[i][j] += 0.10f;
             }
         }
     }
@@ -215,9 +254,8 @@ void MacGrid::advect()
 
 void MacGrid::applyForces() 
 {
-    // alpha and beta have values from p.103 of Bridson
-    float alpha = ALPHA;// (SOOT_DENSITY - AIR_DENSITY) / AIR_DENSITY;
-    float beta = BETA; // 1.0f / AMBIENT_TEMP;
+    float alpha = ALPHA;
+    float beta = BETA;
 
     for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
     {
@@ -310,12 +348,12 @@ void MacGrid::addEntries(Mat &A_diag, Mat &A_x, Mat &A_y,
     float scale = m_dt / (AIR_DENSITY * m_dx * m_dx);
     A_diag[i][j] = 4.0f * scale;
 
-    if(m_mat[a+1][b] == Material::Fluid)
+    if(m_mat[a+1][b] == Material::Smoke)
     {
         A_x[i][j] = -scale;
     }
     
-    if(m_mat[a][b+1] == Material::Fluid)
+    if(m_mat[a][b+1] == Material::Smoke)
     {
         A_y[i][j] = -scale;
     }
@@ -348,7 +386,7 @@ void MacGrid::buildSystem(
             int index = i * (height) + j;
             int b = j + PADDING_WIDTH;
 
-            if(m_mat[a][b] == Material::Fluid)
+            if(m_mat[a][b] == Material::Smoke)
             {
                 rhs[index] = -scale * 
                     ((m_vel.u_[a+1][b] - m_vel.u_[a][b])

@@ -27,11 +27,11 @@ private:
     typedef vector< vector<float> > Mat;
     typedef Triplet<float> Trip;
 
-    enum Material { Fluid, Solid, Empty };
-    enum Quantity { Temp, Soot };
+    enum Material { Smoke, Fuel, Flame, Solid, Empty };
 
 //************** Testing ******************
     void setTestValues();
+    void setFuel();
 
 //**************** Stuff ****************
     void addSmoke();
