@@ -14,9 +14,7 @@ public:
     QGrid(int nx, int ny, float ambient);
 
     // Must advect quantities before velocities
-    void advect(VGrid &v, float dt);
-
-private:
-    float getQuantity(const Vector2f &x);
+    virtual void advect(VGrid &v, float dt, LevelSet *ls = NULL);
+    virtual float getQuantity(const Vector2f &x);
 };
 #endif

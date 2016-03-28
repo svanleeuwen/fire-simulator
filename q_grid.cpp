@@ -9,8 +9,10 @@ QGrid::QGrid(int nx, int ny, float ambient) :
     Grid(nx, ny, ambient) 
 {}
 
-void QGrid::advect(VGrid &v, float dt)
+void QGrid::advect(VGrid &v, float dt, LevelSet *ls)
 {
+    (void) ls;
+
     int nx = m_nx - PADDING_WIDTH * 2;
     int ny = m_ny - PADDING_WIDTH * 2;
 

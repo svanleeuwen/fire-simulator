@@ -1,4 +1,8 @@
+#define SWEEP_COUNT 2
+
 #include "level_set.hpp"
+#include "mac_grid.hpp"
+#include "v_grid.hpp"
 
 #include <cfloat>
 #include <iostream>
@@ -6,6 +10,7 @@
 
 using std::cerr;
 using std::endl;
+using std::cout;
 
 LevelSet::LevelSet(int nx, int ny) :
     Grid(nx, ny, FLT_MAX)
@@ -17,15 +22,125 @@ void LevelSet::redistance()
 {
     redistanceAdjacent();
 
-    for(int i = 0; i < DIM; ++i)
+    for(int k = 0; k < SWEEP_COUNT; ++k)
     {
-        for(int j = 0; j < 2; ++j)
+        for(int i = 0; i < DIM; ++i)
         {
-            sweep((bool)j, (Axis)i);
+            for(int j = 0; j < 2; ++j)
+            {
+                sweep((bool)j, (Axis)i);
+            }
         }
     }
 }
 
+void LevelSet::addCircle(float radius, VGrid &vel,
+        Vector2f center,
+        vector< vector<bool> > *src)
+{
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
+        {
+
+            float dist = sqrt(pow((i-center[0]),2) 
+                        + pow((j-center[1]),2)) - radius;
+
+            if(dist < 0)
+            {
+                at(i)[j] = dist;
+
+/*                Vector2f dir = {i-center[0], j-center[1]};
+                if(dir[0] != 0 || dir[1] != 0)
+                    dir.normalize();
+
+                dir *= 30;
+
+                vel.u_[i][j] = dir[0];
+                vel.v_[i][j] = dir[1];
+*/
+                if(src != NULL)
+                {
+                    src->at(i)[j] = true;
+                }
+            }
+        }
+    }
+}
+
+void LevelSet::advect(float dt, VGrid &velocities)
+{
+    int nx = m_nx - PADDING_WIDTH * 2;
+    int ny = m_ny - PADDING_WIDTH * 2;
+
+    LevelSet update(nx, ny);
+
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
+        {
+            Vector2f x_g(i, j);
+            Vector2f vel = velocities.getVelocity(x_g);
+
+            Vector2f x_p = velocities.rk2(x_g, vel, dt);
+            update[i][j] = lerp(x_p) + dt * BURN_RATE;
+            
+//            Vector2f n = getGradient(Vector2f(i, j));
+//            Vector2f uf = velocities.getVelocity(Vector2f(i, j));
+
+//            Vector2f w = uf + BURN_RATE * n;
+//            Vector2f phi = getUpwind(w, Vector2i(i, j));
+            
+//            update[i][j] = at(i)[j] + dt * w.dot(phi);
+        }
+    }
+
+    *this = std::move(update);
+}
+
+Vector2f LevelSet::getGradient(Vector2f x)
+{
+    return Vector2f(getGradientX(x), getGradientY(x));
+}
+
+float LevelSet::getGradientX(Vector2f x)
+{
+    int i = (int)(x[0] - 0.5f);
+    int j = (int)x[1];
+
+    float bl = (at(i+1)[j] - at(i)[j])/m_dx;
+    float br = (at(i+2)[j] - at(i+1)[j])/m_dx;
+    float tl = (at(i+1)[j+1] - at(i)[j+1])/m_dx;
+    float tr = (at(i+2)[j+1] - at(i+1)[j+1])/m_dx;
+
+    float s_x = x[0] - (i + 0.5f);
+    float s_y = x[1] - j;
+
+    return (1.0f - s_x) * (1.0f - s_y) * bl 
+        + s_x * (1.0f - s_y) * br 
+        + (1.0f - s_x) * s_y * tl 
+        + s_x * s_y * tr;
+}
+
+float LevelSet::getGradientY(Vector2f x)
+{
+    int i = (int)x[0];
+    int j = (int)(x[1] - 0.5f);
+
+    float bl = (at(i)[j+1] - at(i)[j])/m_dx;
+    float br = (at(i+1)[j+1] - at(i+1)[j])/m_dx;
+    float tl = (at(i)[j+2] - at(i)[j+1])/m_dx;
+    float tr = (at(i+1)[j+2] - at(i+1)[j+1])/m_dx;
+
+    float s_x = x[0] - i;
+    float s_y = x[1] - (j + 0.5f);
+    
+    return (1.0f - s_x) * (1.0f - s_y) * bl 
+        + s_x * (1.0f - s_y) * br 
+        + (1.0f - s_x) * s_y * tl 
+        + s_x * s_y * tr;
+
+}
 // This is suboptimal
 void LevelSet::redistanceAdjacent()
 {
@@ -180,4 +295,32 @@ float LevelSet::updateDistance(Vector2f phi)
     }
 
     return d;
+}
+
+Vector2f LevelSet::getUpwind(Vector2f w, Vector2i pos)
+{
+    Vector2f phi;
+
+    int i = pos[0];
+    int j = pos[1];
+
+    if(w[0] > 0)
+    {
+        phi[0] = (at(i)[j] - at(i-1)[j])/m_dx;
+    }
+    else
+    {
+        phi[0] = (at(i+1)[j] - at(i)[j])/m_dx;
+    }
+
+    if(w[1] > 0)
+    {
+        phi[0] = (at(i)[j] - at(i)[j-1])/m_dx;
+    }
+    else
+    {
+        phi[0] = (at(i)[j+1] - at(i)[j])/m_dx;
+    }
+
+    return phi;
 }

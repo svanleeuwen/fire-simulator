@@ -1,17 +1,17 @@
 #define FRAMERATE 10
+#define STEPS_PER_FRAME 3
 
 #include <QtGui>
 #include "paintcanvas.hpp"
+#include "colourUtil.hpp"
 
-// TODO: Draw when the timer runs out, don't start the computation
-//          when it runs out
-
+#define FIRE_SIMULATION true 
 #define MACSIZE 100
 
 PaintCanvas::PaintCanvas(QWidget *parent) :
     QWidget(parent)
 {
-    m_mac = new MacGrid(MACSIZE, 1.0f / FRAMERATE);
+    m_mac = new MacGrid(MACSIZE, 1.0f / (FRAMERATE * STEPS_PER_FRAME), FIRE_SIMULATION);
     m_img = QImage(width(), height(), QImage::Format_RGB32);
 
     m_updateTimer = new QTimer(this);
@@ -44,7 +44,10 @@ void PaintCanvas::paintEvent(QPaintEvent* event)
 
 void PaintCanvas::refresh()
 {
-    m_mac->step();
+    for(int i = 0; i < STEPS_PER_FRAME; ++i)
+    {
+        m_mac->step();
+    }
     m_img = QImage(width(), height(), QImage::Format_RGB32);
 
     for(int i = 0; i < width(); ++i)
@@ -54,10 +57,42 @@ void PaintCanvas::refresh()
             int grid_width = ceil(width() / (float)MACSIZE);
             int grid_height = ceil(height() / (float)MACSIZE);
 
-            uint colour = 255 * std::max(0.0f, m_mac->getDensity(
+            uint colour;
+
+            if(!FIRE_SIMULATION)
+            {
+                colour = 255 * std::max(0.0f, m_mac->getDensity(
                     i / grid_width,
                     j / grid_height));
-            colour = colour + (colour << 8) + (colour << 16);
+                colour = colour + (colour << 8) + (colour << 16);
+            }
+            else
+            {
+                int a = i / grid_width;
+                int b = j / grid_height;
+
+                if(!m_mac->isFuel(a, b) && m_mac->getTemp(a, b) > IGNITION_TEMP)
+                {
+                    colour = getBlackbodyRGB( m_mac->getTemp(
+                        i / grid_width,
+                        j / grid_height) * 2.0); 
+                   /* *
+                        std::max(0.0f, m_mac->getDensity(
+                        i / grid_width,
+                        j / grid_height));*/
+                }
+                else if(!m_mac->isFuel(a, b))
+                {
+                    colour = 255 * std::max(0.0f, m_mac->getDensity(
+                        i / grid_width,
+                        j / grid_height));
+                    colour = colour + (colour << 8) + (colour << 16);
+                }
+                else
+                {
+                    colour = 255;
+                }
+            }
 
             m_img.setPixel(i, height() - j - 1, colour);
         }

@@ -4,3 +4,331 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AIR_DENSITY	mac_grid.cpp	5;"	d	file:
+ALPHA	mac_grid.cpp	20;"	d	file:
+AMBIENT_TEMP	t_grid.hpp	4;"	d
+AR	Makefile	/^AR            = ar cqs$/;"	m
+AverageSpectrumSamples	spectrum.cpp	/^float AverageSpectrumSamples(const float *lambda, const float *vals,$/;"	f
+Axis	grid.hpp	/^    enum Axis { X, Y };$/;"	g	class:Grid
+BETA	mac_grid.cpp	21;"	d	file:
+BURN_RATE	mac_grid.hpp	7;"	d
+Blackbody	spectrum.cpp	/^void Blackbody(const float *wl, int n, float temp, float *vals) {$/;"	f
+CC	Makefile	/^CC            = gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS        = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)$/;"	m
+CHK_DIR_EXISTS	Makefile	/^CHK_DIR_EXISTS= test -d$/;"	m
+CIE_X	spectrum.cpp	/^const float CIE_X[nCIESamples] = {$/;"	v
+CIE_Y	spectrum.cpp	/^const float CIE_Y[nCIESamples] = {$/;"	v
+CIE_Y_integral	spectrum.hpp	/^static const float CIE_Y_integral = 106.856895;$/;"	v
+CIE_Z	spectrum.cpp	/^const float CIE_Z[nCIESamples] = {$/;"	v
+CIE_lambda	spectrum.cpp	/^const float CIE_lambda[nCIESamples] = {$/;"	v
+COLOUR_UTIL_HPP	colourUtil.hpp	2;"	d
+COMPRESS	Makefile	/^COMPRESS      = gzip -9f$/;"	m
+COOLING_CONSTANT	t_grid.hpp	11;"	d
+COPY	Makefile	/^COPY          = cp -f$/;"	m
+COPY_DIR	Makefile	/^COPY_DIR      = cp -f -R$/;"	m
+COPY_FILE	Makefile	/^COPY_FILE     = cp -f$/;"	m
+CXX	Makefile	/^CXX           = g++$/;"	m
+CXXFLAGS	Makefile	/^CXXFLAGS      = -m64 -pipe -W -Wall -g -O2 -std=c++0x -Wall -W -D_REENTRANT -fPIE $(DEFINES)$/;"	m
+Clamp	spectrum.hpp	/^        CoefficientSpectrum Clamp(float low = 0, float high = INFINITY) const {$/;"	f	class:CoefficientSpectrum
+CoefficientSpectrum	spectrum.hpp	/^        CoefficientSpectrum(const CoefficientSpectrum &s) {$/;"	f	class:CoefficientSpectrum
+CoefficientSpectrum	spectrum.hpp	/^        CoefficientSpectrum(float v = 0.f) {$/;"	f	class:CoefficientSpectrum
+CoefficientSpectrum	spectrum.hpp	/^template <int nSamples> class CoefficientSpectrum {$/;"	c
+DEBUG	mac_grid.cpp	1;"	d	file:
+DEFINES	Makefile	/^DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB$/;"	m
+DEL_DIR	Makefile	/^DEL_DIR       = rmdir$/;"	m
+DEL_FILE	Makefile	/^DEL_FILE      = rm -f$/;"	m
+DESTDIR	Makefile	/^DESTDIR       = #avoid trailing-slash linebreak$/;"	m
+DIM	grid.hpp	6;"	d
+DIST	Makefile	/^DIST          = \/usr\/lib\/x86_64-linux-gnu\/qt5\/mkspecs\/features\/spec_pre.prf \\$/;"	m
+EPSILON	grid.hpp	4;"	d
+Empty	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGrid::Material
+Exp	spectrum.hpp	/^        friend CoefficientSpectrum Exp(const CoefficientSpectrum &s) {$/;"	f	class:CoefficientSpectrum
+FIRE_SIMULATION	paintcanvas.cpp	6;"	d	file:
+FLAME_DENSITY	mac_grid.hpp	5;"	d
+FRAMERATE	paintcanvas.cpp	1;"	d	file:
+FUEL_DENSITY	mac_grid.hpp	6;"	d
+Fire	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGrid::Material
+FromRGB	spectrum.cpp	/^SampledSpectrum SampledSpectrum::FromRGB(const float rgb[3],$/;"	f	class:SampledSpectrum
+FromRGB	spectrum.hpp	/^    static RGBSpectrum FromRGB(const float rgb[3],$/;"	f	class:RGBSpectrum
+FromSampled	spectrum.hpp	/^        static SampledSpectrum FromSampled(const float *lambda,$/;"	f	class:SampledSpectrum
+FromSampled	spectrum.hpp	/^    static RGBSpectrum FromSampled(const float *lambda, const float *v,$/;"	f	class:RGBSpectrum
+FromXYZ	spectrum.hpp	/^        static SampledSpectrum FromXYZ(const float xyz[3],$/;"	f	class:SampledSpectrum
+FromXYZ	spectrum.hpp	/^    static RGBSpectrum FromXYZ(const float xyz[3],$/;"	f	class:RGBSpectrum
+G	mac_grid.cpp	4;"	d	file:
+GRID_HPP	grid.hpp	2;"	d
+Grid	grid.cpp	/^Grid::Grid(int nx, int ny, float ambient) :$/;"	f	class:Grid
+Grid	grid.hpp	/^class Grid : public vector< vector<float> >$/;"	c
+HasNaNs	spectrum.hpp	/^        bool HasNaNs() const {$/;"	f	class:CoefficientSpectrum
+IGNITION_TEMP	t_grid.hpp	8;"	d
+INCPATH	Makefile	/^INCPATH       = -I\/usr\/lib\/x86_64-linux-gnu\/qt5\/mkspecs\/linux-g++-64 -I. -I. -I\/usr\/include\/lua5.1 -I\/usr\/include\/qt5 -I\/usr\/include\/qt5\/QtWidgets -I\/usr\/include\/qt5\/QtGui -I\/usr\/include\/qt5\/QtCore -I.$/;"	m
+INSTALL_DIR	Makefile	/^INSTALL_DIR   = $(COPY_DIR)$/;"	m
+INSTALL_FILE	Makefile	/^INSTALL_FILE  = install -m 644 -p$/;"	m
+INSTALL_PROGRAM	Makefile	/^INSTALL_PROGRAM = install -m 755 -p$/;"	m
+INTERP	spectrum.cpp	72;"	d	file:
+INTERP	spectrum.cpp	81;"	d	file:
+Init	spectrum.hpp	/^        static void Init() {$/;"	f	class:SampledSpectrum
+InterpolateSpectrumSamples	spectrum.cpp	/^float InterpolateSpectrumSamples(const float *lambda, const float *vals,$/;"	f
+IsBlack	spectrum.hpp	/^        bool IsBlack() const {$/;"	f	class:CoefficientSpectrum
+LEVEL_SET_HPP	level_set.hpp	2;"	d
+LFLAGS	Makefile	/^LFLAGS        = -m64 -Wl,-O1$/;"	m
+LIBS	Makefile	/^LIBS          = $(SUBLIBS) -L\/usr\/X11R6\/lib64 -llua5.1 -lQt5Widgets -L\/usr\/lib\/x86_64-linux-gnu -lQt5Gui -lQt5Core -lGL -lpthread $/;"	m
+LINK	Makefile	/^LINK          = g++$/;"	m
+Lerp	spectrum.hpp	/^inline Spectrum Lerp(float t, const Spectrum &s1, const Spectrum &s2) {$/;"	f
+LevelSet	level_set.cpp	/^LevelSet::LevelSet(int nx, int ny) :$/;"	f	class:LevelSet
+LevelSet	level_set.hpp	/^class LevelSet : public Grid$/;"	c
+MACSIZE	paintcanvas.cpp	11;"	d	file:
+MAC_GRID_HPP	mac_grid.hpp	2;"	d
+MAKEFILE	Makefile	/^MAKEFILE      = Makefile$/;"	m
+MAX_TEMP	t_grid.hpp	7;"	d
+MKDIR	Makefile	/^MKDIR         = mkdir -p$/;"	m
+MOVE	Makefile	/^MOVE          = mv -f$/;"	m
+MacGrid	mac_grid.cpp	/^MacGrid::MacGrid(int res, float dt, bool fire) :$/;"	f	class:MacGrid
+MacGrid	mac_grid.hpp	/^class MacGrid {$/;"	c
+Mat	mac_grid.hpp	/^    typedef vector< vector<float> > Mat;$/;"	t	class:MacGrid
+Material	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	g	class:MacGrid
+OBJECTS	Makefile	/^OBJECTS       = main.o \\$/;"	m
+OBJECTS_DIR	Makefile	/^OBJECTS_DIR   = .\/$/;"	m
+OUTER_VELOCITY	v_grid.cpp	1;"	d	file:
+PADDING_WIDTH	grid.hpp	5;"	d
+PAINTCANVAS_HPP	paintcanvas.hpp	2;"	d
+PAINTWINDOW_HPP	paintwindow.hpp	2;"	d
+PBRT_CORE_SPECTRUM_H	spectrum.hpp	30;"	d
+PaintCanvas	paintcanvas.cpp	/^PaintCanvas::PaintCanvas(QWidget *parent) :$/;"	f	class:PaintCanvas
+PaintCanvas	paintcanvas.hpp	/^class PaintCanvas : public QWidget {$/;"	c
+PaintWindow	paintwindow.cpp	/^PaintWindow::PaintWindow() $/;"	f	class:PaintWindow
+PaintWindow	paintwindow.hpp	/^class PaintWindow : public QMainWindow$/;"	c
+Pow	spectrum.hpp	/^Pow(const CoefficientSpectrum<nSamples> &s, float e) {$/;"	f
+Print	spectrum.hpp	/^        void Print(FILE *f) const {$/;"	f	class:CoefficientSpectrum
+QGrid	q_grid.cpp	/^QGrid::QGrid(int nx, int ny, float ambient) :$/;"	f	class:QGrid
+QGrid	q_grid.hpp	/^class QGrid : public Grid $/;"	c
+QMAKE	Makefile	/^QMAKE         = \/usr\/lib\/x86_64-linux-gnu\/qt5\/bin\/qmake$/;"	m
+QMAKE_TARGET	Makefile	/^QMAKE_TARGET  = fire$/;"	m
+QT_MOC_LITERAL	moc_paintcanvas.cpp	25;"	d	file:
+QT_MOC_LITERAL	moc_paintcanvas.cpp	38;"	d	file:
+QT_MOC_LITERAL	moc_paintwindow.cpp	25;"	d	file:
+QT_MOC_LITERAL	moc_paintwindow.cpp	36;"	d	file:
+Q_GRID_HPP	q_grid.hpp	2;"	d
+RANLIB	Makefile	/^RANLIB        = $/;"	m
+RGB2SpectLambda	spectrum.cpp	/^const float RGB2SpectLambda[nRGB2SpectSamples] = {$/;"	v
+RGBIllum2SpectBlue	spectrum.cpp	/^const float RGBIllum2SpectBlue[nRGB2SpectSamples] =  {$/;"	v
+RGBIllum2SpectCyan	spectrum.cpp	/^const float RGBIllum2SpectCyan[nRGB2SpectSamples] =  {$/;"	v
+RGBIllum2SpectGreen	spectrum.cpp	/^const float RGBIllum2SpectGreen[nRGB2SpectSamples] =  {$/;"	v
+RGBIllum2SpectMagenta	spectrum.cpp	/^const float RGBIllum2SpectMagenta[nRGB2SpectSamples] =  {$/;"	v
+RGBIllum2SpectRed	spectrum.cpp	/^const float RGBIllum2SpectRed[nRGB2SpectSamples] =  {$/;"	v
+RGBIllum2SpectWhite	spectrum.cpp	/^const float RGBIllum2SpectWhite[nRGB2SpectSamples] =     {$/;"	v
+RGBIllum2SpectYellow	spectrum.cpp	/^const float RGBIllum2SpectYellow[nRGB2SpectSamples] =  {$/;"	v
+RGBRefl2SpectBlue	spectrum.cpp	/^const float RGBRefl2SpectBlue[nRGB2SpectSamples] =   {$/;"	v
+RGBRefl2SpectCyan	spectrum.cpp	/^const float RGBRefl2SpectCyan[nRGB2SpectSamples] =   {$/;"	v
+RGBRefl2SpectGreen	spectrum.cpp	/^const float RGBRefl2SpectGreen[nRGB2SpectSamples] =   {$/;"	v
+RGBRefl2SpectMagenta	spectrum.cpp	/^const float RGBRefl2SpectMagenta[nRGB2SpectSamples] =  {$/;"	v
+RGBRefl2SpectRed	spectrum.cpp	/^const float RGBRefl2SpectRed[nRGB2SpectSamples] =   {$/;"	v
+RGBRefl2SpectWhite	spectrum.cpp	/^const float RGBRefl2SpectWhite[nRGB2SpectSamples] =       {$/;"	v
+RGBRefl2SpectYellow	spectrum.cpp	/^const float RGBRefl2SpectYellow[nRGB2SpectSamples] =  {$/;"	v
+RGBSpectrum	spectrum.hpp	/^    RGBSpectrum(const CoefficientSpectrum<3> &v)$/;"	f	class:RGBSpectrum
+RGBSpectrum	spectrum.hpp	/^    RGBSpectrum(const RGBSpectrum &s, SpectrumType type = SPECTRUM_REFLECTANCE) {$/;"	f	class:RGBSpectrum
+RGBSpectrum	spectrum.hpp	/^    RGBSpectrum(float v = 0.f) : CoefficientSpectrum<3>(v) { }$/;"	f	class:RGBSpectrum
+RGBSpectrum	spectrum.hpp	/^class RGBSpectrum : public CoefficientSpectrum<3> {$/;"	c
+RGBToXYZ	spectrum.hpp	/^inline void RGBToXYZ(const float rgb[3], float xyz[3]) {$/;"	f
+Read	spectrum.hpp	/^        bool Read(FILE *f) {$/;"	f	class:CoefficientSpectrum
+SED	Makefile	/^SED           = sed$/;"	m
+SEG_AVG	spectrum.cpp	75;"	d	file:
+SEG_AVG	spectrum.cpp	82;"	d	file:
+SIXTH	grid.cpp	2;"	d	file:
+SIZE	lvlsetTest.cpp	1;"	d	file:
+SOOT_DENSITY	mac_grid.cpp	17;"	d	file:
+SOURCES	Makefile	/^SOURCES       = main.cpp \\$/;"	m
+SPECTRUM_ILLUMINANT	spectrum.hpp	/^enum SpectrumType { SPECTRUM_REFLECTANCE, SPECTRUM_ILLUMINANT };$/;"	e	enum:SpectrumType
+SPECTRUM_REFLECTANCE	spectrum.hpp	/^enum SpectrumType { SPECTRUM_REFLECTANCE, SPECTRUM_ILLUMINANT };$/;"	e	enum:SpectrumType
+STRIP	Makefile	/^STRIP         = strip$/;"	m
+SWEEP_COUNT	level_set.cpp	1;"	d	file:
+SYMLINK	Makefile	/^SYMLINK       = ln -f -s$/;"	m
+SampledSpectrum	spectrum.cpp	/^SampledSpectrum::SampledSpectrum(const RGBSpectrum &r, SpectrumType t) {$/;"	f	class:SampledSpectrum
+SampledSpectrum	spectrum.hpp	/^        SampledSpectrum(const CoefficientSpectrum<nSpectralSamples> &v)$/;"	f	class:SampledSpectrum
+SampledSpectrum	spectrum.hpp	/^        SampledSpectrum(float v = 0.f) {$/;"	f	class:SampledSpectrum
+SampledSpectrum	spectrum.hpp	/^class SampledSpectrum : public CoefficientSpectrum<nSpectralSamples> {$/;"	c
+Solid	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGrid::Material
+SortSpectrumSamples	spectrum.cpp	/^void SortSpectrumSamples(float *lambda, float *vals, int n) {$/;"	f
+SpectrumSamplesSorted	spectrum.cpp	/^bool SpectrumSamplesSorted(const float *lambda, const float *vals, int n) {$/;"	f
+SpectrumType	spectrum.hpp	/^enum SpectrumType { SPECTRUM_REFLECTANCE, SPECTRUM_ILLUMINANT };$/;"	g
+Sqrt	spectrum.hpp	/^        friend CoefficientSpectrum Sqrt(const CoefficientSpectrum &s) {$/;"	f	class:CoefficientSpectrum
+TAR	Makefile	/^TAR           = tar -cf$/;"	m
+TARGET	Makefile	/^TARGET        = fire$/;"	m
+TGrid	t_grid.cpp	/^TGrid::TGrid(int nx, int ny, float ambient)$/;"	f	class:TGrid
+TGrid	t_grid.hpp	/^class TGrid : public QGrid$/;"	c
+THIRD	grid.cpp	1;"	d	file:
+T_GRID_HPP	t_grid.hpp	2;"	d
+ToRGB	spectrum.hpp	/^        void ToRGB(float rgb[3]) const {$/;"	f	class:SampledSpectrum
+ToRGB	spectrum.hpp	/^    void ToRGB(float *rgb) const {$/;"	f	class:RGBSpectrum
+ToRGBSpectrum	spectrum.cpp	/^RGBSpectrum SampledSpectrum::ToRGBSpectrum() const {$/;"	f	class:SampledSpectrum
+ToRGBSpectrum	spectrum.hpp	/^    const RGBSpectrum &ToRGBSpectrum() const {$/;"	f	class:RGBSpectrum
+ToXYZ	colourUtil.cpp	/^void ToXYZ(float *wavelengths, int n, float *vals, float xyz[3]) $/;"	f
+ToXYZ	spectrum.hpp	/^        void ToXYZ(float xyz[3]) const {$/;"	f	class:SampledSpectrum
+ToXYZ	spectrum.hpp	/^    void ToXYZ(float xyz[3]) const {$/;"	f	class:RGBSpectrum
+Trip	mac_grid.hpp	/^    typedef Triplet<float> Trip;$/;"	t	class:MacGrid
+VGrid	v_grid.cpp	/^VGrid::VGrid(int nx, int ny) :$/;"	f	class:VGrid
+VGrid	v_grid.hpp	/^class VGrid$/;"	c
+VIENNACL_WITH_EIGEN	mac_grid.cpp	2;"	d	file:
+V_GRID_HPP	v_grid.hpp	2;"	d
+Write	spectrum.hpp	/^        bool Write(FILE *f) const {$/;"	f	class:CoefficientSpectrum
+X	grid.hpp	/^    enum Axis { X, Y };$/;"	e	enum:Grid::Axis
+X	spectrum.cpp	/^SampledSpectrum SampledSpectrum::X;$/;"	m	class:SampledSpectrum	file:
+X	spectrum.hpp	/^        static SampledSpectrum X, Y, Z;$/;"	m	class:SampledSpectrum
+XYZToRGB	spectrum.hpp	/^inline void XYZToRGB(const float xyz[3], float rgb[3]) {$/;"	f
+Y	grid.hpp	/^    enum Axis { X, Y };$/;"	e	enum:Grid::Axis
+Y	spectrum.cpp	/^SampledSpectrum SampledSpectrum::Y;$/;"	m	class:SampledSpectrum	file:
+Y	spectrum.hpp	/^        static SampledSpectrum X, Y, Z;$/;"	m	class:SampledSpectrum
+Z	spectrum.cpp	/^SampledSpectrum SampledSpectrum::Z;$/;"	m	class:SampledSpectrum	file:
+Z	spectrum.hpp	/^        static SampledSpectrum X, Y, Z;$/;"	m	class:SampledSpectrum
+addEntries	mac_grid.cpp	/^void MacGrid::addEntries(Mat &A_diag, Mat &A_x, Mat &A_y, $/;"	f	class:MacGrid
+addFuel	mac_grid.cpp	/^void MacGrid::addFuel()$/;"	f	class:MacGrid
+addSmoke	mac_grid.cpp	/^void MacGrid::addSmoke()$/;"	f	class:MacGrid
+addTriplets	mac_grid.cpp	/^void MacGrid::addTriplets(const Mat &A_diag, const Mat &A_x, $/;"	f	class:MacGrid
+advect	level_set.cpp	/^void LevelSet::advect(float dt, VGrid &velocities)$/;"	f	class:LevelSet
+advect	mac_grid.cpp	/^void MacGrid::advect() $/;"	f	class:MacGrid
+advect	q_grid.cpp	/^void QGrid::advect(VGrid &v, float dt, LevelSet *ls)$/;"	f	class:QGrid
+advect	t_grid.cpp	/^void TGrid::advect(VGrid &v, float dt, LevelSet *ls)$/;"	f	class:TGrid
+advect	v_grid.cpp	/^void VGrid::advect(float dt, Grid::Axis ax, Grid &ret, $/;"	f	class:VGrid
+advect	v_grid.cpp	/^void VGrid::advect(float dt, LevelSet *ls)$/;"	f	class:VGrid
+applyForces	mac_grid.cpp	/^void MacGrid::applyForces() $/;"	f	class:MacGrid
+applyJumpConditions	v_grid.cpp	/^void VGrid::applyJumpConditions(Vector2f &x, Grid::Axis ax,$/;"	f	class:VGrid
+applyPressure	mac_grid.cpp	/^void MacGrid::applyPressure()$/;"	f	class:MacGrid
+buildSystem	mac_grid.cpp	/^void MacGrid::buildSystem($/;"	f	class:MacGrid
+c	spectrum.hpp	/^        float c[nSamples];$/;"	m	class:CoefficientSpectrum
+clampSoot	mac_grid.cpp	/^static void clampSoot(QGrid &soot, int nx, int ny)$/;"	f	file:
+clamp_pos	v_grid.cpp	/^Vector2f VGrid::clamp_pos(const Vector2f &pos)$/;"	f	class:VGrid
+data	moc_paintcanvas.cpp	/^    QByteArrayData data[3];$/;"	m	struct:qt_meta_stringdata_PaintCanvas_t	file:
+data	moc_paintwindow.cpp	/^    QByteArrayData data[1];$/;"	m	struct:qt_meta_stringdata_PaintWindow_t	file:
+decay	t_grid.cpp	/^float TGrid::decay(float temp, float dt)$/;"	f	class:TGrid
+getBlackbodyRGB	colourUtil.cpp	/^unsigned int getBlackbodyRGB(float temp)$/;"	f
+getCorrectedRhs	mac_grid.cpp	/^float MacGrid::getCorrectedRhs(Vector2i pos)$/;"	f	class:MacGrid
+getDensity	mac_grid.cpp	/^float MacGrid::getDensity(int i, int j)$/;"	f	class:MacGrid
+getGradient	level_set.cpp	/^Vector2f LevelSet::getGradient(Vector2f x)$/;"	f	class:LevelSet
+getGradientX	level_set.cpp	/^float LevelSet::getGradientX(Vector2f x)$/;"	f	class:LevelSet
+getGradientY	level_set.cpp	/^float LevelSet::getGradientY(Vector2f x)$/;"	f	class:LevelSet
+getQuantity	q_grid.cpp	/^float QGrid::getQuantity(const Vector2f &x)$/;"	f	class:QGrid
+getTemp	mac_grid.cpp	/^float MacGrid::getTemp(int i, int j)$/;"	f	class:MacGrid
+getUpwind	level_set.cpp	/^Vector2f LevelSet::getUpwind(Vector2f w, Vector2i pos)$/;"	f	class:LevelSet
+getValue	grid.cpp	/^float Grid::getValue(const Vector2i &x, const Vector2f &s) {$/;"	f	class:Grid
+getVelocity	v_grid.cpp	/^Vector2f VGrid::getVelocity(const Vector2f &x)$/;"	f	class:VGrid
+getVelocityU	v_grid.cpp	/^float VGrid::getVelocityU(const Vector2f &x)$/;"	f	class:VGrid
+getVelocityV	v_grid.cpp	/^float VGrid::getVelocityV(const Vector2f &x)$/;"	f	class:VGrid
+getW_x	grid.cpp	/^Vector4f Grid::getW_x(const Vector4f &q)$/;"	f	class:Grid
+getW_x	tests/interpTest.cpp	/^Vector4f getW_x(const Vector4f &q)$/;"	f
+getW_y	grid.cpp	/^Vector4f Grid::getW_y(const Vector2i &x)$/;"	f	class:Grid
+isFuel	mac_grid.cpp	/^bool MacGrid::isFuel(int i, int j)$/;"	f	class:MacGrid
+keyPressEvent	paintwindow.cpp	/^void PaintWindow::keyPressEvent(QKeyEvent *event) {$/;"	f	class:PaintWindow
+lerp	grid.cpp	/^float Grid::lerp(const Vector2f &x)$/;"	f	class:Grid
+m_ambient	grid.hpp	/^    float m_ambient;$/;"	m	class:Grid
+m_canvas	paintwindow.hpp	/^    PaintCanvas* m_canvas;$/;"	m	class:PaintWindow
+m_dt	mac_grid.hpp	/^    float m_dt;$/;"	m	class:MacGrid
+m_dx	level_set.hpp	/^    float m_dx;$/;"	m	class:LevelSet
+m_dx	mac_grid.hpp	/^    float m_dx;$/;"	m	class:MacGrid
+m_img	paintcanvas.hpp	/^    QImage m_img;$/;"	m	class:PaintCanvas
+m_interface	mac_grid.hpp	/^    LevelSet *m_interface;$/;"	m	class:MacGrid
+m_mac	paintcanvas.hpp	/^    MacGrid *m_mac;$/;"	m	class:PaintCanvas
+m_mat	mac_grid.hpp	/^    vector< vector<Material> > m_mat;$/;"	m	class:MacGrid
+m_nx	grid.hpp	/^    int m_nx;$/;"	m	class:Grid
+m_nx	mac_grid.hpp	/^    int m_nx;$/;"	m	class:MacGrid
+m_nx	v_grid.hpp	/^    int m_nx;$/;"	m	class:VGrid
+m_ny	grid.hpp	/^    int m_ny;$/;"	m	class:Grid
+m_ny	mac_grid.hpp	/^    int m_ny;$/;"	m	class:MacGrid
+m_ny	v_grid.hpp	/^    int m_ny;$/;"	m	class:VGrid
+m_press	mac_grid.hpp	/^    Grid m_press;$/;"	m	class:MacGrid
+m_soot	mac_grid.hpp	/^    QGrid m_soot;$/;"	m	class:MacGrid
+m_src	mac_grid.hpp	/^    vector< vector<bool> > m_src;$/;"	m	class:MacGrid
+m_temp	mac_grid.hpp	/^    TGrid m_temp;$/;"	m	class:MacGrid
+m_updateTimer	paintcanvas.hpp	/^    QTimer *m_updateTimer;$/;"	m	class:PaintCanvas
+m_vel	mac_grid.hpp	/^    VGrid m_vel;$/;"	m	class:MacGrid
+main	lvlsetTest.cpp	/^int main()$/;"	f
+main	main.cpp	/^int main(int argc, char** argv) {$/;"	f
+main	tests/interpTest.cpp	/^int main()$/;"	f
+metaObject	moc_paintcanvas.cpp	/^const QMetaObject *PaintCanvas::metaObject() const$/;"	f	class:PaintCanvas
+metaObject	moc_paintwindow.cpp	/^const QMetaObject *PaintWindow::metaObject() const$/;"	f	class:PaintWindow
+minimumSizeHint	paintcanvas.cpp	/^QSize PaintCanvas::minimumSizeHint() const $/;"	f	class:PaintCanvas
+nCIESamples	spectrum.hpp	/^static const int nCIESamples = 471;$/;"	v
+nRGB2SpectSamples	spectrum.hpp	/^static const int nRGB2SpectSamples = 32;$/;"	v
+nSpectralSamples	spectrum.hpp	/^static const int nSpectralSamples = 30;$/;"	v
+operator !=	spectrum.hpp	/^        bool operator!=(const CoefficientSpectrum &sp) const {$/;"	f	class:CoefficientSpectrum
+operator *	spectrum.hpp	/^            CoefficientSpectrum operator*(float a, const CoefficientSpectrum &s) {$/;"	f	class:CoefficientSpectrum
+operator *	spectrum.hpp	/^        CoefficientSpectrum operator*(const CoefficientSpectrum &sp) const {$/;"	f	class:CoefficientSpectrum
+operator *	spectrum.hpp	/^        CoefficientSpectrum operator*(float a) const {$/;"	f	class:CoefficientSpectrum
+operator *=	spectrum.hpp	/^        CoefficientSpectrum &operator*=(const CoefficientSpectrum &sp) {$/;"	f	class:CoefficientSpectrum
+operator *=	spectrum.hpp	/^        CoefficientSpectrum &operator*=(float a) {$/;"	f	class:CoefficientSpectrum
+operator +	spectrum.hpp	/^        CoefficientSpectrum operator+(const CoefficientSpectrum &s2) const {$/;"	f	class:CoefficientSpectrum
+operator +=	spectrum.hpp	/^        CoefficientSpectrum &operator+=(const CoefficientSpectrum &s2) {$/;"	f	class:CoefficientSpectrum
+operator -	spectrum.hpp	/^        CoefficientSpectrum operator-() const {$/;"	f	class:CoefficientSpectrum
+operator -	spectrum.hpp	/^        CoefficientSpectrum operator-(const CoefficientSpectrum &s2) const {$/;"	f	class:CoefficientSpectrum
+operator /	spectrum.hpp	/^        CoefficientSpectrum operator\/(const CoefficientSpectrum &s2) const {$/;"	f	class:CoefficientSpectrum
+operator /	spectrum.hpp	/^        CoefficientSpectrum operator\/(float a) const {$/;"	f	class:CoefficientSpectrum
+operator /=	spectrum.hpp	/^        CoefficientSpectrum &operator\/=(float a) {$/;"	f	class:CoefficientSpectrum
+operator <<	grid.cpp	/^std::ostream& operator<<(std::ostream &out, Grid &grid)$/;"	f
+operator <<	v_grid.cpp	/^std::ostream& operator<<(std::ostream &out, VGrid &grid)$/;"	f
+operator =	spectrum.hpp	/^        CoefficientSpectrum &operator=(const CoefficientSpectrum &s) {$/;"	f	class:CoefficientSpectrum
+operator ==	spectrum.hpp	/^        bool operator==(const CoefficientSpectrum &sp) const {$/;"	f	class:CoefficientSpectrum
+paintEvent	paintcanvas.cpp	/^void PaintCanvas::paintEvent(QPaintEvent* event) $/;"	f	class:PaintCanvas
+project	mac_grid.cpp	/^void MacGrid::project() $/;"	f	class:MacGrid
+qt_meta_data_PaintCanvas	moc_paintcanvas.cpp	/^static const uint qt_meta_data_PaintCanvas[] = {$/;"	v	file:
+qt_meta_data_PaintWindow	moc_paintwindow.cpp	/^static const uint qt_meta_data_PaintWindow[] = {$/;"	v	file:
+qt_meta_stringdata_PaintCanvas	moc_paintcanvas.cpp	/^static const qt_meta_stringdata_PaintCanvas_t qt_meta_stringdata_PaintCanvas = {$/;"	v	file:
+qt_meta_stringdata_PaintCanvas_t	moc_paintcanvas.cpp	/^struct qt_meta_stringdata_PaintCanvas_t {$/;"	s	file:
+qt_meta_stringdata_PaintWindow	moc_paintwindow.cpp	/^static const qt_meta_stringdata_PaintWindow_t qt_meta_stringdata_PaintWindow = {$/;"	v	file:
+qt_meta_stringdata_PaintWindow_t	moc_paintwindow.cpp	/^struct qt_meta_stringdata_PaintWindow_t {$/;"	s	file:
+qt_metacall	moc_paintcanvas.cpp	/^int PaintCanvas::qt_metacall(QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:PaintCanvas
+qt_metacall	moc_paintwindow.cpp	/^int PaintWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:PaintWindow
+qt_metacast	moc_paintcanvas.cpp	/^void *PaintCanvas::qt_metacast(const char *_clname)$/;"	f	class:PaintCanvas
+qt_metacast	moc_paintwindow.cpp	/^void *PaintWindow::qt_metacast(const char *_clname)$/;"	f	class:PaintWindow
+qt_static_metacall	moc_paintcanvas.cpp	/^void PaintCanvas::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:PaintCanvas
+qt_static_metacall	moc_paintwindow.cpp	/^void PaintWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:PaintWindow
+redistance	level_set.cpp	/^void LevelSet::redistance()$/;"	f	class:LevelSet
+redistanceAdjacent	level_set.cpp	/^void LevelSet::redistanceAdjacent()$/;"	f	class:LevelSet
+refresh	paintcanvas.cpp	/^void PaintCanvas::refresh()$/;"	f	class:PaintCanvas
+rgbIllum2SpectBlue	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectBlue;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectBlue	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectBlue;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectCyan	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectCyan;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectCyan	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectWhite, rgbIllum2SpectCyan;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectGreen	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectGreen;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectGreen	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectRed, rgbIllum2SpectGreen;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectMagenta	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectMagenta;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectMagenta	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectMagenta, rgbIllum2SpectYellow;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectRed	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectRed;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectRed	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectRed, rgbIllum2SpectGreen;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectWhite	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectWhite;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectWhite	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectWhite, rgbIllum2SpectCyan;$/;"	m	class:SampledSpectrum
+rgbIllum2SpectYellow	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbIllum2SpectYellow;$/;"	m	class:SampledSpectrum	file:
+rgbIllum2SpectYellow	spectrum.hpp	/^        static SampledSpectrum rgbIllum2SpectMagenta, rgbIllum2SpectYellow;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectBlue	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectBlue;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectBlue	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectBlue;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectCyan	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectCyan;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectCyan	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectWhite, rgbRefl2SpectCyan;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectGreen	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectGreen;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectGreen	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectRed, rgbRefl2SpectGreen;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectMagenta	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectMagenta;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectMagenta	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectMagenta, rgbRefl2SpectYellow;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectRed	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectRed;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectRed	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectRed, rgbRefl2SpectGreen;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectWhite	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectWhite;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectWhite	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectWhite, rgbRefl2SpectCyan;$/;"	m	class:SampledSpectrum
+rgbRefl2SpectYellow	spectrum.cpp	/^SampledSpectrum SampledSpectrum::rgbRefl2SpectYellow;$/;"	m	class:SampledSpectrum	file:
+rgbRefl2SpectYellow	spectrum.hpp	/^        static SampledSpectrum rgbRefl2SpectMagenta, rgbRefl2SpectYellow;$/;"	m	class:SampledSpectrum
+rk2	v_grid.cpp	/^Vector2f VGrid::rk2(const Vector2f &x_g, const Vector2f &vel,$/;"	f	class:VGrid
+sampledLambdaEnd	spectrum.hpp	/^static const int sampledLambdaEnd = 700;$/;"	v
+sampledLambdaStart	spectrum.hpp	/^static const int sampledLambdaStart = 400;$/;"	v
+setTestValues	mac_grid.cpp	/^void MacGrid::setTestValues()$/;"	f	class:MacGrid
+sizeHint	paintcanvas.cpp	/^QSize PaintCanvas::sizeHint() const $/;"	f	class:PaintCanvas
+solveSystem	mac_grid.cpp	/^void MacGrid::solveSystem($/;"	f	class:MacGrid
+sortDistances	level_set.cpp	/^static Vector2f sortDistances(Vector2f phi)$/;"	f	file:
+staticMetaObject	moc_paintcanvas.cpp	/^const QMetaObject PaintCanvas::staticMetaObject = {$/;"	m	class:PaintCanvas	file:
+staticMetaObject	moc_paintwindow.cpp	/^const QMetaObject PaintWindow::staticMetaObject = {$/;"	m	class:PaintWindow	file:
+step	mac_grid.cpp	/^void MacGrid::step() $/;"	f	class:MacGrid
+stringdata	moc_paintcanvas.cpp	/^    char stringdata[22];$/;"	m	struct:qt_meta_stringdata_PaintCanvas_t	file:
+stringdata	moc_paintwindow.cpp	/^    char stringdata[13];$/;"	m	struct:qt_meta_stringdata_PaintWindow_t	file:
+sweep	level_set.cpp	/^void LevelSet::sweep(bool increasing, Axis ax)$/;"	f	class:LevelSet
+testSolver	mac_grid.cpp	/^void MacGrid::testSolver()$/;"	f	class:MacGrid
+u_	v_grid.hpp	/^    Grid u_;$/;"	m	class:VGrid
+updateDistance	level_set.cpp	/^float LevelSet::updateDistance(Vector2f phi)$/;"	f	class:LevelSet
+updatePressure	mac_grid.cpp	/^void MacGrid::updatePressure(const VectorXf &result)$/;"	f	class:MacGrid
+v_	v_grid.hpp	/^    Grid v_;$/;"	m	class:VGrid
+y	spectrum.hpp	/^        float y() const {$/;"	f	class:SampledSpectrum
+y	spectrum.hpp	/^    float y() const {$/;"	f	class:RGBSpectrum
+~PaintCanvas	paintcanvas.cpp	/^PaintCanvas::~PaintCanvas() $/;"	f	class:PaintCanvas
+~PaintWindow	paintwindow.hpp	/^    virtual ~PaintWindow() {}$/;"	f	class:PaintWindow

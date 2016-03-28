@@ -2,6 +2,7 @@
 #define V_GRID_HPP
 
 #include "grid.hpp"
+#include "level_set.hpp"
 
 using Eigen::Vector2i;
 
@@ -11,9 +12,8 @@ public:
     VGrid(int nx, int ny);
 
     // Must advect quantities before velocities
-    void advect(float dt);
-    
-    // Gets the velocity at an arbitrary point x
+    void advect(float dt, LevelSet *ls = NULL);
+   
     Vector2f getVelocity(const Vector2f &x);
     Vector2f rk2(const Vector2f &x_g, const Vector2f &vel, 
             float dt);
@@ -21,11 +21,25 @@ public:
     Grid u_;
     Grid v_;
 
+protected:
+    Vector2f getVelocity(const Vector2f &x, LevelSet *ls);
+    Vector2f rk2(const Vector2f &x_g, const Vector2f &vel, 
+            float dt, LevelSet *ls);
+
+    Vector2f rk3(const Vector2f &x_g, const Vector2f &vel, 
+            float dt, LevelSet *ls);
+
 private:
-    void advect(float dt, Grid::Axis ax, Grid &ret);
+    void advect(float dt, Grid::Axis ax, Grid &ret, 
+            LevelSet *ls = NULL);
+    float applyJumpConditions(Vector2i x, Grid::Axis ax,
+            float val, LevelSet *ls);
+
+    float getValue(Grid &g, const Vector2i &x, const Vector2f &s,
+            Grid::Axis ax, LevelSet *ls);
     
-    float getVelocityU(const Vector2f &x);
-    float getVelocityV(const Vector2f &x);
+    float getVelocityU(const Vector2f &x, LevelSet *ls = NULL);
+    float getVelocityV(const Vector2f &x, LevelSet *ls = NULL);
 
     Vector2f clamp_pos(const Vector2f &pos);
 
@@ -33,5 +47,7 @@ private:
 
     int m_nx;
     int m_ny;
+
+    bool advectingFlame;
 };
 #endif

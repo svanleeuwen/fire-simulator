@@ -1,8 +1,7 @@
-#define DEBUG
+#define CIRCLE 
 #define VIENNACL_WITH_EIGEN
 
 #define G -9.81f
-#define AMBIENT_TEMP 273.0f // degK
 #define AIR_DENSITY 1.3f // kg/m^3
 
 /* Guessed this value based on Figure 6 from 
@@ -15,19 +14,13 @@
  *
  */
 
-// From Nguyen 2002
-#define FLAME_DENSITY 0.05f // kg/m^3
-#define BURN_RATE 0.5f // m/s
-
 #define SOOT_DENSITY FLAME_DENSITY
 
 // alpha and beta have values from p.103 of Bridson
 #define ALPHA (SOOT_DENSITY - AIR_DENSITY) / AIR_DENSITY
 #define BETA 1.0f / AMBIENT_TEMP
 
-// Max temp from Wikipedia temp for candle flame
-#define MAX_TEMP 1673.0f
-#define IGNITION_TEMP 1000.0f
+#define VORTICITY_EPS 1.0f
 
 #include "mac_grid.hpp"
 #include "viennacl/linalg/cg.hpp"
@@ -41,15 +34,9 @@ using std::endl;
 
 using Eigen::Vector4f;
 
-/* *********** First Fire Paper ************
- *
- * TODO: Read Bridson and paper
- *
- */
 
 /* *********** Major Goals ****************
  *
- * TODO: Implement first fire paper
  * TODO: Write goals for second fire paper
  *
  * TODO: Convert to 3D 
@@ -61,32 +48,14 @@ using Eigen::Vector4f;
  */
 
 /************ Fire Goals ********************
- * 
- * TODO: Jump conditions (Bridson)
- * TODO: Temperature decay (Bridson)
- * TODO: Render flame
- *          - First: Red and yellow
- *          - Second: Blackbody radiation
+ *
+ * TODO: Variable density for the matrix: smoke + p136
  *
  */
 
-/* *********** Extra Stuff **************
- *
- * TODO: Consider rk3 (90% sure you should be doing this since rk3 helps preserve vortices)
- * TODO: May be worth implementing your own solver for speedup
- * TODO: Handle solids
- * TODO: Maybe switch linear system in project() 
- *       to double precision
- * TODO: Precondition the matrix
- * TODO: Maybe use particle methods for rendering
- * TODO: Set up UI to tweak alpha/beta for buoyency and phi for vorticy confinment
- *
- */
 
-/********** Optional smoke stuff ************
+/********** Smoke goals ************
  *
- * TODO: Update cubic interpolator using Appendix B of Fedkiw or Bridson's course notes
- * TODO: Density Decay (probably don't do this)
  * TODO: Diffusion (p100 Bridson) (Look to viscous fluids if
  *       you want to do this properly)
  * TODO: Variable Density (not necessary for the most part) <<<< Probably necessary for fire
@@ -94,8 +63,16 @@ using Eigen::Vector4f;
  **
  */
 
+/* *********** Extra Stuff **************
+ *
+ * TODO: Handle solids
+ * TODO: Precondition the matrix
+ * TODO: Set up UI to tweak alpha/beta for buoyency and phi for vorticy confinment
+ *
+ */
+
+
 //**************** Testing *******************
-#ifdef DEBUG
 void MacGrid::setTestValues()
 {
     for(uint i = 2; i < m_press.size() - 2; ++i)
@@ -103,10 +80,10 @@ void MacGrid::setTestValues()
         for(uint j = 2; j < m_press[0].size() - 2; ++j)
         {
             m_press[i][j] = 1;
-            m_mat[i][j] = Material::Smoke;
+            m_mat[i][j] = Material::Fire;
         }
     }
-
+/*
     for(uint i = 2; i < m_vel.u_.size() - 2; ++i) {
         for(uint j = 2; j < m_vel.u_[0].size() - 2; ++j) {
             m_vel.u_[i][j] = 1.0f;
@@ -118,15 +95,33 @@ void MacGrid::setTestValues()
             m_vel.v_[i][j] = 1.0f;
         }
     }
-
+*/
     for(int i = 2; i < m_nx - 2;  ++i) {
         for(int j = 2; j < m_ny - 2; ++j) {
     //        m_temp[i].push_back((i + j) % 3);
         }
     }
 
-//    m_src[(int)(m_nx / 2.0f) - 1][5] = true;
-//    m_src[(int)(m_nx / 2.0f)][5] = true;
+#ifdef FLAMETHROWERS
+    for(int i = PADDING_WIDTH + 3; 
+            i < PADDING_WIDTH + 8; ++i)
+    {
+        for(int j = PADDING_WIDTH + 13; 
+                j < PADDING_WIDTH + 18; ++j)
+        {
+            m_src[i][j] = true;
+       //     m_src[m_nx - i][j] = true;
+        }
+    }
+#endif
+
+#ifdef CIRCLE
+    for(int i = PADDING_WIDTH + 8; i < m_nx - PADDING_WIDTH - 8; i += 8)
+    {
+        m_interface->addCircle(2.0f, m_vel, Vector2f(i, 15), 
+                &m_src);
+    }               
+#endif
 
     /*cout << "Initialized grids" << endl << endl;
     cout << "P :" << endl << m_press;
@@ -136,40 +131,31 @@ void MacGrid::setTestValues()
     cout << endl;*/
 }
 
-void MacGrid::setFuel()
-{
-    m_mat[(int)(m_nx / 2.0f) - 1][5] = Material::Fuel;
-    m_mat[(int)(m_nx / 2.0f)][5] = Material::Fuel;
-
-    m_temp[(int)(m_nx / 2.0f) - 1][5] = IGNITION_TEMP;
-    m_temp[(int)(m_nx / 2.0f)][5] = IGNITION_TEMP;
-}
-
 void MacGrid::testSolver()
 {
     setTestValues();
 
     int size = (m_nx-PADDING_WIDTH*2)*(m_ny-PADDING_WIDTH*2);
     
-    SparseMatrix<float, Eigen::RowMajor> sm(size, size);
+    SparseMatrix<double, Eigen::RowMajor> sm(size, size);
     sm.reserve(5 * size);
     
-    VectorXf rhs(size);
+    VectorXd rhs(size);
     buildSystem(sm, rhs);
     
 //    cout << sm << endl;
 //    cout << rhs << endl;
 
-    VectorXf result(size);
+    VectorXd result(size);
     solveSystem(sm, rhs, result);
 
 //    cout << result << endl;
 }
-#endif
 
 //**************** Public ******************
-MacGrid::MacGrid(int res, float dt) :
-    m_vel(res, res), m_press(res, res, 0.0f), m_temp(res, res, AMBIENT_TEMP), 
+MacGrid::MacGrid(int res, float dt, bool fire) :
+    m_vel(res, res), m_press(res, res, 0.0f), 
+    m_temp(res, res, AMBIENT_TEMP), 
     m_soot(res, res, 0.0f)
 {
     m_nx = res + PADDING_WIDTH * 2;
@@ -186,15 +172,24 @@ MacGrid::MacGrid(int res, float dt) :
         m_src[i].resize(m_ny, false);
     }
 
+    if(fire)
+    {
+        m_interface = new LevelSet(res, res);
+    }
+    else
+    {
+        m_interface = NULL;
+    }
+
     setTestValues();
 }
 
 void MacGrid::step() 
 {
-    addSmoke();
+    addFuel();
     advect();
 
-    /*cout << "Advected grids" << endl << endl;
+/*    cout << "Advected grids" << endl << endl;
     cout << "P :" << endl << m_press;
     cout << endl << m_vel;
     cout << endl << "T :" << endl << m_temp;
@@ -220,39 +215,129 @@ float MacGrid::getDensity(int i, int j)
     return m_soot[a][b];
 }
 
+bool MacGrid::isFuel(int i, int j)
+{
+    int a = i + PADDING_WIDTH;
+    int b = j + PADDING_WIDTH;
+    
+    return m_interface->at(a)[b] < 0;
+}
+
+float MacGrid::getTemp(int i, int j)
+{
+    int a = i + PADDING_WIDTH;
+    int b = j + PADDING_WIDTH;
+
+    return m_temp[a][b];
+}
+
 void MacGrid::addSmoke()
 {
-    static int count = 0;
-    if(count++ > 500)
-    {
-        return;
-    }
-
     for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
     {
         for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
         {
             if(m_src[i][j])
             {
-                 m_temp[i][j] += 50.0f;
+                 m_temp[i][j] += 100.0f;
                  m_soot[i][j] += 0.10f;
             }
         }
     }
 }
 
+void MacGrid::addFuel()
+{
+#ifdef CIRCLE
+    for(int i = PADDING_WIDTH + 8; i < m_nx - PADDING_WIDTH - 8; i += 8)
+    {
+        m_interface->addCircle(2.0f, m_vel, Vector2f(i, 15), 
+                &m_src);
+    }               
+/*
+    m_interface->addCircle(4.0f, m_vel, 
+            Vector2f(m_nx/2.0f, 15));
+    
+    m_interface->addCircle(4.0f, m_vel, 
+            Vector2f(m_nx/2.0f + 20, 15));
+    m_interface->addCircle(4.0f, m_vel, 
+            Vector2f(m_nx/2.0f - 20, 15));*/
+#endif
+    
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
+        {
+            if(m_src[i][j])
+            {
+#ifdef FLAMETHROWERS
+                m_interface->at(i)[j] = -1;
+
+                if(i < (int)(m_nx / 2.0))
+                {
+                    m_vel.u_[i][j] = 100;
+                }
+                else
+                {
+                    m_vel.u_[i][j] = -100;
+                }
+                m_vel.v_[i][j] = 0;
+#endif
+
+#ifdef CIRCLE
+                m_vel.v_[i][j] = 30.0f;
+#endif
+            }
+        }
+    }
+
+    m_interface->redistance();
+}
+
 //******************* Advection **********************
+
+static void clampSoot(QGrid &soot, int nx, int ny)
+{
+    for(int i = 0; i < nx; ++i)
+    {
+        for(int j = 0; j < ny; ++j)
+        {
+            if(soot[i][j] < 0.0f)
+            {
+                soot[i][j] = 0.0f;
+            }
+            else if(soot[i][j] > 1.0f)
+            {
+                soot[i][j] = 1.0f;
+            }
+        }
+    }
+}
 
 void MacGrid::advect() 
 {
-    m_temp.advect(m_vel, m_dt);
-    m_soot.advect(m_vel, m_dt);
-    m_vel.advect(m_dt);
+    if(m_interface != NULL)
+    {
+        m_interface->advect(m_dt, m_vel);
+        m_interface->redistance();
+    }
+    m_temp.advect(m_vel, m_dt, m_interface);
+
+    m_soot.advect(m_vel, m_dt, m_interface);
+    clampSoot(m_soot, m_nx, m_ny);
+
+    m_vel.advect(m_dt, m_interface);
 }
 
 //********************* Forces ***************************
 
-void MacGrid::applyForces() 
+void MacGrid::applyForces()
+{
+    applyBuoyancy();
+    applyVorticity();
+}
+
+void MacGrid::applyBuoyancy() 
 {
     float alpha = ALPHA;
     float beta = BETA;
@@ -269,9 +354,156 @@ void MacGrid::applyForces()
             float buoy = (alpha * soot - beta 
                     * (temp - AMBIENT_TEMP)) * G;
 
-            m_vel.v_[i][j] = m_vel.v_[i][j] + m_dt * buoy;
+            m_vel.v_[i][j] += m_dt * buoy;
         }
     }
+}
+
+// 2D version of vorticity from p167 of Bridson
+void MacGrid::applyVorticity()
+{
+    Grid omega(m_nx - PADDING_WIDTH, m_ny - PADDING_WIDTH, 0.0f);
+    
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; 
+                j < m_ny - PADDING_WIDTH; ++j)
+        {
+            omega[i][j] = getOmega(i, j);
+        }
+    }
+
+    QGrid vortX(m_nx - PADDING_WIDTH, 
+            m_ny - PADDING_WIDTH, 0.0f);
+    QGrid vortY(m_nx - PADDING_WIDTH, 
+            m_ny - PADDING_WIDTH, 0.0f);
+
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; 
+                j < m_ny - PADDING_WIDTH; ++j)
+        {
+            Vector2f gradOmega = getGradOmega(omega, i, j);
+
+            float gradOmegaNorm = sqrt(gradOmega[0] * 
+                    gradOmega[0] + gradOmega[1] * gradOmega[1]);
+            float denom = gradOmegaNorm + 10e-20 * (1.0f / 
+                    (m_dx * m_dt));
+
+            Vector2f N = {gradOmega[0] / denom,
+                gradOmega[1] / denom};
+
+            // Here, we take the cross product of
+            //      (0, 0, omega) and (N[0], N[1], 0)
+            Vector2f f = VORTICITY_EPS * m_dx * 
+                Vector2f(-omega[i][j] * N[1], omega[i][j] * N[0]);
+
+            vortX[i][j] = f[0];
+            vortY[i][j] = f[1];
+        }
+    }
+
+    for(int i = PADDING_WIDTH; i < m_nx + 1 - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; 
+                j < m_ny + 1 - PADDING_WIDTH; ++j)
+        {
+            if(i < m_nx - PADDING_WIDTH)
+            {
+                m_vel.u_[i][j] += m_dt * vortX.getQuantity(
+                        Vector2f(i-0.5f, j));
+            }
+            if(j < m_ny - PADDING_WIDTH)
+            {
+                m_vel.v_[i][j] += m_dt * vortY.getQuantity(
+                        Vector2f(i, j-0.5f));
+            }
+        }
+    }
+}
+
+float MacGrid::getOmega(int i, int j)
+{
+    float t2;
+    if(i == m_nx - PADDING_WIDTH - 1)
+    {
+        t2 =  (m_vel.getVelocity(Vector2f(i, j))[0] - 
+            m_vel.getVelocity(Vector2f(i-1, j))[0]) 
+            / (2.0f*m_dx);
+    }
+    else if(i == PADDING_WIDTH)
+    {
+        t2 =  (m_vel.getVelocity(Vector2f(i+1, j))[0] - 
+            m_vel.getVelocity(Vector2f(i, j))[0]) 
+            / (2.0f*m_dx);
+    }
+    else
+    {
+        t2 =  (m_vel.getVelocity(Vector2f(i+1, j))[0] - 
+            m_vel.getVelocity(Vector2f(i-1, j))[0]) 
+            / (2.0f*m_dx);
+    }
+
+    float t1;
+    if(j == m_ny - PADDING_WIDTH - 1)
+    {
+        t1 = (m_vel.getVelocity(Vector2f(i, j))[1] - 
+            m_vel.getVelocity(Vector2f(i, j-1))[1]) 
+            / (2.0f*m_dx);
+    }
+    else if(j == 0)
+    {
+        t1 = (m_vel.getVelocity(Vector2f(i, j+1))[1] - 
+            m_vel.getVelocity(Vector2f(i, j))[1]) 
+            / (2.0f*m_dx);
+    }
+    else
+    {
+        t1 = (m_vel.getVelocity(Vector2f(i, j+1))[1] - 
+            m_vel.getVelocity(Vector2f(i, j-1))[1]) 
+            / (2.0f*m_dx);
+    }
+
+    return t1 - t2;
+}
+
+Vector2f MacGrid::getGradOmega(Grid &omega, int i, int j)
+{
+    float gradOmegaX;
+    if(i == m_nx - PADDING_WIDTH - 1)
+    {
+        gradOmegaX = (omega[i][j] - omega[i-1][j])
+            / (2.0f * m_dx);
+    }
+    else if(i == PADDING_WIDTH)
+    {
+        gradOmegaX = (omega[i+1][j] - omega[i][j])
+            / (2.0f * m_dx);
+    }
+    else
+    {
+        gradOmegaX = (omega[i+1][j] - omega[i-1][j])
+            / (2.0f * m_dx);
+    }
+
+    float gradOmegaY;
+    if(j == m_ny - PADDING_WIDTH - 1)
+    {
+        gradOmegaY = (omega[i][j] - omega[i][j-1])
+            / (2.0f * m_dx);
+    }
+    else if(j == 0)
+    {
+        gradOmegaY = (omega[i][j+1] - omega[i][j])
+            / (2.0f * m_dx);
+    }
+    else
+    {
+        gradOmegaY = (omega[i][j+1] - omega[i][j-1])
+            / (2.0f * m_dx);
+    }
+
+    return Vector2f(gradOmegaX, gradOmegaY);
 }
 
 //******************* Projection **************************
@@ -280,13 +512,13 @@ void MacGrid::project()
 {
     int size = (m_nx-PADDING_WIDTH*2)*(m_ny-PADDING_WIDTH*2);
     
-    SparseMatrix<float, Eigen::RowMajor> sm(size, size);
+    SparseMatrix<double, Eigen::RowMajor> sm(size, size);
     sm.reserve(5 * size);
     
-    VectorXf rhs(size);
+    VectorXd rhs(size);
     buildSystem(sm, rhs);
 
-    VectorXf result(size);
+    VectorXd result(size);
     solveSystem(sm, rhs, result);
 
     updatePressure(result);
@@ -348,12 +580,12 @@ void MacGrid::addEntries(Mat &A_diag, Mat &A_x, Mat &A_y,
     float scale = m_dt / (AIR_DENSITY * m_dx * m_dx);
     A_diag[i][j] = 4.0f * scale;
 
-    if(m_mat[a+1][b] == Material::Smoke)
+    if(m_mat[a+1][b] == Material::Fire)
     {
         A_x[i][j] = -scale;
     }
     
-    if(m_mat[a][b+1] == Material::Smoke)
+    if(m_mat[a][b+1] == Material::Fire)
     {
         A_y[i][j] = -scale;
     }
@@ -362,8 +594,8 @@ void MacGrid::addEntries(Mat &A_diag, Mat &A_x, Mat &A_y,
 // Divergence calculation from p.72 of Bridson, ignoring scale,
 //      to build rhs
 void MacGrid::buildSystem(
-        SparseMatrix<float, Eigen::RowMajor> &sm, 
-        VectorXf &rhs)
+        SparseMatrix<double, Eigen::RowMajor> &sm, 
+        VectorXd &rhs)
 {
     int width = m_nx - PADDING_WIDTH*2;
     int height = m_ny - PADDING_WIDTH*2;
@@ -386,11 +618,11 @@ void MacGrid::buildSystem(
             int index = i * (height) + j;
             int b = j + PADDING_WIDTH;
 
-            if(m_mat[a][b] == Material::Smoke)
+            if(m_mat[a][b] == Material::Fire)
             {
-                rhs[index] = -scale * 
-                    ((m_vel.u_[a+1][b] - m_vel.u_[a][b])
-                        + (m_vel.v_[a][b+1] - m_vel.v_[a][b]));
+
+                rhs[index] = -scale 
+                    * getCorrectedRhs(Vector2i(a, b));
 
                 addEntries(A_diag, A_x, A_y, Vector2i(i, j));
             }
@@ -405,14 +637,96 @@ void MacGrid::buildSystem(
     sm.setFromTriplets(trip.begin(), trip.end());
 }
 
+float MacGrid::getCorrectedRhs(Vector2i pos)
+{
+    int a = pos[0];
+    int b = pos[1];
+
+    float l_jump = 0.0f;
+    float r_jump = 0.0f;
+    float t_jump = 0.0f;
+    float b_jump = 0.0f;
+
+    if(m_interface != NULL)
+    {
+        float dv = (FUEL_DENSITY 
+                / FLAME_DENSITY - 1.0f) * BURN_RATE;
+
+        bool isFuel = m_interface->at(a)[b] < 0;
+
+        bool isLeftFuel = 
+            m_interface->lerp(Vector2f(a-0.5f, b)) < 0; 
+        
+        if(isFuel && !isLeftFuel)
+        {
+            l_jump -= dv 
+                * m_interface->getGradientX(Vector2f(a, b));
+        }
+        else if(!isFuel && isLeftFuel)
+        {
+            l_jump += dv 
+                * m_interface->getGradientX(Vector2f(a, b));
+        }
+
+        bool isRightFuel = 
+            m_interface->lerp(Vector2f(a+0.5f, b)) < 0; 
+
+        if(isFuel && !isRightFuel)
+        {
+            r_jump -= dv 
+                * m_interface->getGradientX(Vector2f(a+1, b));
+        }
+        else if(!isFuel && isRightFuel)
+        {
+            r_jump += dv 
+                * m_interface->getGradientX(Vector2f(a+1, b));
+        }
+
+        bool isBottomFuel = 
+            m_interface->lerp(Vector2f(a, b-0.5f)) < 0; 
+
+        if(isFuel && !isBottomFuel)
+        {
+            b_jump -= dv
+                * m_interface->getGradientY(Vector2f(a, b));
+        }
+        else if(!isFuel && isBottomFuel)
+        {
+            b_jump += dv
+                * m_interface->getGradientY(Vector2f(a, b));
+        }
+
+        bool isTopFuel = 
+            m_interface->lerp(Vector2f(a, b+0.5f)) < 0; 
+        
+        if(isFuel && !isTopFuel)
+        {
+            t_jump -= dv 
+                * m_interface->getGradientY(Vector2f(a, b+1));
+        }
+        else if(!isFuel && isTopFuel)
+        {
+            t_jump += dv 
+                * m_interface->getGradientY(Vector2f(a, b+1));
+        }
+    }
+
+    float left = m_vel.u_[a][b] + l_jump;
+    float right = m_vel.u_[a+1][b] + r_jump;
+    float top = m_vel.v_[a][b+1] + t_jump;
+    float bottom = m_vel.v_[a][b] + b_jump;
+
+    return (right - left + top - bottom);
+}
+
 void MacGrid::solveSystem(
-        const SparseMatrix<float, Eigen::RowMajor> &sm, 
-        const VectorXf &rhs, VectorXf &result)
+        const SparseMatrix<double, Eigen::RowMajor> &sm, 
+        const VectorXd &rhs, VectorXd &result)
 {
     result = viennacl::linalg::solve(sm, rhs, viennacl::linalg::cg_tag());
 }
 
-void MacGrid::updatePressure(const VectorXf &result)
+void MacGrid::updatePressure(const VectorXd &result)
 {
     int size = (m_nx-PADDING_WIDTH*2)*(m_ny-PADDING_WIDTH*2);
     int height = m_ny - PADDING_WIDTH * 2;
@@ -436,8 +750,10 @@ void MacGrid::applyPressure()
     {
         for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
         {
-            m_vel.u_[i][j] -= scale * (m_press[i][j] - m_press[i-1][j]);
-            m_vel.v_[i][j] -= scale * (m_press[i][j] - m_press[i][j-1]);
+            m_vel.u_[i][j] -= scale * (m_press[i][j] 
+                    - m_press[i-1][j]);
+            m_vel.v_[i][j] -= scale * (m_press[i][j] 
+                    - m_press[i][j-1]);
         }
     }
 }

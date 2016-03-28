@@ -10,6 +10,7 @@
 
 using Eigen::Vector2f;
 using Eigen::Vector2i;
+using Eigen::Vector4f;
 
 using std::vector;
 
@@ -20,6 +21,9 @@ public:
     
     Grid(int nx, int ny, float ambient);
     float getValue(const Vector2i &x, const Vector2f &s);
+    float lerp(const Vector2f &x);
+
+    Vector4f getW(const Vector4f &q);
 
 protected:
     int m_nx;

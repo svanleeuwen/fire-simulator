@@ -1,0 +1,2 @@
+all :
+	g++ -o lvlset -std=c++0x lvlsetTest.cpp level_set.cpp v_grid.cpp grid.cpp
