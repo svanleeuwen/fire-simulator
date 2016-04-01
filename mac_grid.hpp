@@ -2,13 +2,14 @@
 #define MAC_GRID_HPP
 
 // From Nguyen 2002
-#define FLAME_DENSITY 0.05f // kg/m^3
+#define FLAME_DENSITY 0.01f // kg/m^3
 #define FUEL_DENSITY 1.0f // kg/m^3
-#define BURN_RATE 0.1f // m/s
+#define BURN_RATE 0.08f // m/s
 
 #include "s_grid.hpp"
 #include "t_grid.hpp"
 #include "v_grid.hpp"
+#include "d_grid.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
@@ -22,7 +23,7 @@ using Eigen::Triplet;
 class MacGrid {
 
 public:
-    MacGrid(int res, float dt, bool fire = false);
+    MacGrid(int res, float dt, float scale);
 
     void step();
     float getDensity(int i, int j);
@@ -39,19 +40,22 @@ private:
 
 //************** Testing ******************
     void setTestValues();
-
-//**************** Stuff ****************
     void addSmoke();
     void addFuel();
+    
+//************** Advection *****************
     void advect();
+
+//************ Update Forces ****************
 
     void applyForces();
     void applyBuoyancy();
     void applyVorticity();
    
     float getOmega(int i, int j);
-    Vector2f getGradOmega(Grid &omega, int i, int j);
-    Vector2f getVorticity(int i, int j);
+    Vector2f getGrad(int i, int j, Grid &g);
+    float getGradX(int i, int j, Grid &g);
+    float getGradY(int i, int j, Grid &g);
 
 //*************** Projection *****************
     void project();
@@ -64,25 +68,33 @@ private:
             VectorXd &rhs);
 
     float getCorrectedRhs(Vector2i pos);
-    void solveSystem(
-            const SparseMatrix<double, Eigen::RowMajor> &sm,
-            const VectorXd &rhs, VectorXd &result);
     void updatePressure(const VectorXd &result);
     void applyPressure();
+
+//****************** DSD ********************
+    void updateBurn();
+    void updateMeanCurvature();
+
 
 //**************** Variables ******************
     int m_nx;
     int m_ny;
+
     float m_dt;
+    float m_scale;
     float m_dx;
+    
+    LevelSet m_interface;
+    DGrid m_curvature;
+    
+    DGrid m_burn;
+    DGrid m_dburn;
     
     VGrid m_vel;
     Grid m_press;
     
     TGrid m_temp;
     SGrid m_soot;
-
-    LevelSet *m_interface;
 
     vector< vector<Material> > m_mat;
     vector< vector<bool> > m_src;

@@ -1,4 +1,5 @@
 #include "s_grid.hpp"
+#include "v_grid.hpp"
 
 #define MAX_SOOT 0.5f
 

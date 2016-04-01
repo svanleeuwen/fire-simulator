@@ -1,8 +1,9 @@
-#define FRAMERATE 20
+#define FRAMERATE 10
 #define STEPS_PER_FRAME 2
-#define LENGTH 20
+#define LENGTH 10
 
 #define MACSIZE 150
+#define SCALE 1.0f
 
 #define IMG_H 600
 #define IMG_W 600
@@ -30,13 +31,14 @@ int main(int argc, char **argv)
     }
 
     string prefix = argv[1];
-    MacGrid mac(MACSIZE, 1.0f / (FRAMERATE * STEPS_PER_FRAME), true);
+    MacGrid mac(MACSIZE, 1.0f / (FRAMERATE * STEPS_PER_FRAME), SCALE);
 
     for(int i = 0; i < LENGTH; ++i)
     {
         for(int j = 0; j < FRAMERATE; ++j)
         {
             QImage img(IMG_W, IMG_H, QImage::Format_RGB32);
+            QImage imgBlue(IMG_W, IMG_H, QImage::Format_RGB32);
 
             for(int k = 0; k < STEPS_PER_FRAME; ++k)
             {
@@ -79,10 +81,18 @@ int main(int argc, char **argv)
                     }
 
                     img.setPixel(i, IMG_H - j - 1, colour);
+
+                    int bl = colour % 256;
+                    int g = (colour >> 8) % 256;
+                    int r = (colour >> 16) % 256;
+
+//                    imgBlue.setPixel(i, IMG_H - j - 1, (bl << 16) + (g << 8) + r);
                 }
             }
 
             img.save(QString::fromStdString(prefix + "/frame" + std::to_string(count) + ".jpg"));
+            cout << "Saving frame " << count << endl;
+//           imgBlue.save(QString::fromStdString("out2/frame" + std::to_string(count) + ".jpg"));
             ++count;
         }
     }

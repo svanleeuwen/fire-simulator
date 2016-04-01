@@ -2,11 +2,13 @@
 #define Q_GRID_HPP
 
 #include "grid.hpp"
-#include "v_grid.hpp"
+#include "level_set.hpp"
 
 #include <vector>
 
 using std::vector;
+
+class VGrid;
 
 class QGrid : public Grid 
 {

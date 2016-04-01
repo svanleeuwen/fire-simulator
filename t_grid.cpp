@@ -1,4 +1,5 @@
 #include "t_grid.hpp"
+#include "v_grid.hpp"
 
 TGrid::TGrid(int nx, int ny, float ambient)
     : QGrid(nx, ny, ambient)

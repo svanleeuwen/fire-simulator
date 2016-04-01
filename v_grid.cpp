@@ -11,15 +11,17 @@ using std::cerr;
 using std::endl;
 using Eigen::Vector4f;
 
-VGrid::VGrid(int nx, int ny) :
+VGrid::VGrid(int nx, int ny, LevelSet *interface, DGrid *burn) :
     u_(nx+1, ny, OUTER_VELOCITY), 
-    v_(nx, ny+1, OUTER_VELOCITY) 
+    v_(nx, ny+1, OUTER_VELOCITY),
+    m_interface(interface),
+    m_burn(burn)
 {
     m_nx = nx + PADDING_WIDTH * 2;
     m_ny = ny + PADDING_WIDTH * 2;
 }
 
-void VGrid::advect(float dt, LevelSet *ls)
+void VGrid::advect(float dt)
 {
     int nx = m_nx - PADDING_WIDTH * 2;
     int ny = m_ny - PADDING_WIDTH * 2;
@@ -27,49 +29,37 @@ void VGrid::advect(float dt, LevelSet *ls)
     Grid u_copy(nx+1, ny, OUTER_VELOCITY);
     Grid v_copy(nx, ny+1, OUTER_VELOCITY);
 
-    advect(dt, Grid::Axis::X, u_copy, ls);
-    advect(dt, Grid::Axis::Y, v_copy, ls);
+    advect(dt, Grid::Axis::X, u_copy);
+    advect(dt, Grid::Axis::Y, v_copy);
 
     u_ = std::move(u_copy);
     v_ = std::move(v_copy);
 }
 
-Vector2f VGrid::getVelocity(const Vector2f &x)
+Vector2f VGrid::getVelocity(const Vector2f &x, bool advecting)
 {
-    return getVelocity(x, NULL);
-}
-
-// ls = NULL if not advecting
-Vector2f VGrid::getVelocity(const Vector2f &x, LevelSet *ls)
-{
-    return Vector2f(getVelocityU(x, ls), getVelocityV(x, ls));
+    return Vector2f(getVelocityU(x, advecting), 
+            getVelocityV(x, advecting));
 }
 
 // Runge-Kutta 2 from Bridson p.32
-// ls = NULL if not advecting
 Vector2f VGrid::rk2(const Vector2f &x_g, const Vector2f &vel,
-        float dt, LevelSet *ls) 
+        float dt, bool advecting) 
 {
 /*    Vector2f x_mid = clamp_pos(x_g - 0.5f * dt * vel);
     return clamp_pos(x_g - dt * getVelocity(x_mid, ls));*/
 
-    return rk3(x_g, vel, dt, ls);
-}
-
-Vector2f VGrid::rk2(const Vector2f &x_g, const Vector2f &vel,
-        float dt) 
-{
-    return rk2(x_g, vel, dt, NULL);
+    return rk3(x_g, vel, dt, advecting);
 }
 
 Vector2f VGrid::rk3(const Vector2f &x_g, const Vector2f &vel,
-        float dt, LevelSet *ls) 
+        float dt, bool advecting) 
 {
     Vector2f k1 = vel;
     Vector2f k2 = getVelocity(clamp_pos(
-                x_g - 0.5f * dt * k1), ls);
+                x_g - 0.5f * dt * k1), advecting);
     Vector2f k3 = getVelocity(clamp_pos(
-                x_g - 0.75f * dt * k2), ls);
+                x_g - 0.75f * dt * k2), advecting);
 
     Vector2f ret = x_g - dt * (1.0f/9.0f) * 
         (2.0f * k1 + 3.0f * k2 + 4.0f * k3);
@@ -78,15 +68,8 @@ Vector2f VGrid::rk3(const Vector2f &x_g, const Vector2f &vel,
 }
 
 
-void VGrid::advect(float dt, Grid::Axis ax, Grid &ret, 
-        LevelSet *ls)
+void VGrid::advect(float dt, Grid::Axis ax, Grid &ret)
 {
-    if(ls == NULL)
-    {
-        cerr << "whyyyyy" << endl;
-        exit(1);
-    }
-
     int width = m_nx + (ax == Grid::Axis::X);
     int height = m_ny + (ax == Grid::Axis::Y);
 
@@ -97,20 +80,20 @@ void VGrid::advect(float dt, Grid::Axis ax, Grid &ret,
             Vector2f x_g(i, j);
             x_g[ax] -= 0.5f;
 
-            advectingFlame = ls->lerp(x_g) > 0;
+            advectingFlame = m_interface->lerp(x_g) > 0;
                        
-            Vector2f vel = getVelocity(x_g, ls);
-            Vector2f x_p = rk2(x_g, vel, dt, ls);
+            Vector2f vel = getVelocity(x_g, true);
+            Vector2f x_p = rk2(x_g, vel, dt, true);
 
             switch(ax)
             {
                 case Grid::Axis::X:
-                    ret[i][j] = getVelocityU(x_p, ls);
+                    ret[i][j] = getVelocityU(x_p, true);
                     
                     break;
 
                 case Grid::Axis::Y:
-                    ret[i][j] = getVelocityV(x_p, ls);
+                    ret[i][j] = getVelocityV(x_p, true);
                     break;
                
                 default:
@@ -123,31 +106,26 @@ void VGrid::advect(float dt, Grid::Axis ax, Grid &ret,
 
 // Jump condition p135 of Bridson
 float VGrid::applyJumpConditions(Vector2i x, Grid::Axis ax,
-            float val, LevelSet *ls)
+            float val)
 {
-    if(ls == NULL)
-    {
-        return val;
-    }
-
     int i = x[0];
     int j = x[1];
 
     float dv = (FUEL_DENSITY / FLAME_DENSITY - 1.0f)
-        * BURN_RATE;
+        * m_burn->at(i)[j];
     float n;
 
     // Flame advecting from fuel
-    if(ls->at(i)[j] > 0 && !advectingFlame)
+    if(m_interface->at(i)[j] > 0 && !advectingFlame)
     {
         switch(ax)
         {
             case Grid::Axis::X:
-                n = ls->getGradientX(Vector2f(i, j));
+                n = m_interface->getGradientX(Vector2f(i, j));
                 break;
             
             case Grid::Axis::Y:
-                n = ls->getGradientY(Vector2f(i, j));
+                n = m_interface->getGradientY(Vector2f(i, j));
                 break;
             
             default:
@@ -159,16 +137,16 @@ float VGrid::applyJumpConditions(Vector2i x, Grid::Axis ax,
     }
 
     // Fuel advecting from flame
-    else if(ls->at(i)[j] < 0 && advectingFlame)
+    else if(m_interface->at(i)[j] < 0 && advectingFlame)
     {
         switch(ax)
         {
             case Grid::Axis::X:
-                n = ls->getGradientX(Vector2f(i, j));
+                n = m_interface->getGradientX(Vector2f(i, j));
                 break;
             
             case Grid::Axis::Y:
-                n = ls->getGradientY(Vector2f(i, j));
+                n = m_interface->getGradientY(Vector2f(i, j));
                 break;
             
             default:
@@ -184,9 +162,9 @@ float VGrid::applyJumpConditions(Vector2i x, Grid::Axis ax,
 
 // Monotonic cubic interpolation from Fedkiw 2001 for smoke
 float VGrid::getValue(Grid &g, const Vector2i &x, 
-        const Vector2f &s, Grid::Axis ax, LevelSet *ls) 
+        const Vector2f &s, Grid::Axis ax, bool advecting) 
 {
-    if(ls == NULL)
+    if(!advecting)
     {
         return g.getValue(x, s);
     }
@@ -203,11 +181,11 @@ float VGrid::getValue(Grid &g, const Vector2i &x,
             if(s[0] < EPSILON)
             {
                 return applyJumpConditions(Vector2i(i+1, j+1),
-                        ax, g.at(i+1)[j+1], ls);
+                        ax, g.at(i+1)[j+1]);
             }
 
             q[a] = applyJumpConditions(Vector2i(i+a,j+1),
-                    ax, g.at(i+a)[j+1], ls);
+                    ax, g.at(i+a)[j+1]);
         }
         else
         {
@@ -220,7 +198,7 @@ float VGrid::getValue(Grid &g, const Vector2i &x,
             for(int c = 0; c < 4; ++c)
             {
                 p[c] = applyJumpConditions(Vector2i(i+a,j+c),
-                        ax, g.at(i+a)[j+c], ls);
+                        ax, g.at(i+a)[j+c]);
             }
 
             Vector4f w_y = g.getW(p);
@@ -249,7 +227,7 @@ float VGrid::getValue(Grid &g, const Vector2i &x,
 }
 
 
-float VGrid::getVelocityU(const Vector2f &x, LevelSet *ls)
+float VGrid::getVelocityU(const Vector2f &x, bool advecting)
 {
     int i = (int)(x[0] + 0.5f) - 1;
     int j = (int)(x[1]) - 1;
@@ -257,10 +235,10 @@ float VGrid::getVelocityU(const Vector2f &x, LevelSet *ls)
     float s_y = x[1] - j - 1.0f;
 
     return getValue(u_, Vector2i(i, j), Vector2f(s_x, s_y),
-            Grid::Axis::X, ls);
+            Grid::Axis::X, advecting);
 }
 
-float VGrid::getVelocityV(const Vector2f &x, LevelSet *ls)
+float VGrid::getVelocityV(const Vector2f &x, bool advecting)
 {
     int i = (int)(x[0]) - 1;
     int j = (int)(x[1] + 0.5f) - 1;
@@ -268,7 +246,7 @@ float VGrid::getVelocityV(const Vector2f &x, LevelSet *ls)
     float s_y = x[1] - j - 0.5f;
 
     return getValue(v_, Vector2i(i, j), Vector2f(s_x, s_y),
-            Grid::Axis::Y, ls);
+            Grid::Axis::Y, advecting);
 }
 
 Vector2f VGrid::clamp_pos(const Vector2f &pos)

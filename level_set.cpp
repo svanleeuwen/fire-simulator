@@ -3,6 +3,7 @@
 #include "level_set.hpp"
 #include "mac_grid.hpp"
 #include "v_grid.hpp"
+#include "d_grid.hpp"
 
 #include <cfloat>
 #include <iostream>
@@ -34,7 +35,7 @@ void LevelSet::redistance()
     }
 }
 
-void LevelSet::addCircle(float radius, VGrid &vel,
+void LevelSet::addCircle(float radius,
         Vector2f center,
         vector< vector<bool> > *src)
 {
@@ -68,7 +69,7 @@ void LevelSet::addCircle(float radius, VGrid &vel,
     }
 }
 
-void LevelSet::advect(float dt, VGrid &velocities)
+void LevelSet::advect(float dt, VGrid &velocities, DGrid &burn)
 {
     int nx = m_nx - PADDING_WIDTH * 2;
     int ny = m_ny - PADDING_WIDTH * 2;
@@ -83,7 +84,7 @@ void LevelSet::advect(float dt, VGrid &velocities)
             Vector2f vel = velocities.getVelocity(x_g);
 
             Vector2f x_p = velocities.rk2(x_g, vel, dt);
-            update[i][j] = lerp(x_p) + dt * BURN_RATE;
+            update[i][j] = lerp(x_p) + dt * burn.lerp(x_p);
             
 //            Vector2f n = getGradient(Vector2f(i, j));
 //            Vector2f uf = velocities.getVelocity(Vector2f(i, j));
@@ -141,6 +142,16 @@ float LevelSet::getGradientY(Vector2f x)
         + s_x * s_y * tr;
 
 }
+
+bool LevelSet::inFuelRegion(int i, int j)
+{
+    return (at(i)[j] <= 0 
+            || at(i-1)[j] < 0 
+            || at(i+1)[j] < 0 
+            || at(i)[j-1] < 0 
+            || at(i)[j+1] < 0);
+}
+
 // This is suboptimal
 void LevelSet::redistanceAdjacent()
 {
