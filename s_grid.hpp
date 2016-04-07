@@ -6,8 +6,12 @@
 class SGrid : public QGrid
 {
 public:
-    SGrid(int nx, int ny, float ambient);
+    SGrid(int res, float ambient, float dx);
     virtual void advect(VGrid &v, float dt, LevelSet *ls = NULL);
+
+private:
+    void advectHandler(Vector2i bounds, VGrid &v, 
+            float dt, LevelSet *ls, SGrid &update);
 };
 
 #endif

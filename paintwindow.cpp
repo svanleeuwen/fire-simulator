@@ -2,7 +2,7 @@
 
 PaintWindow::PaintWindow() 
 {
-    setWindowTitle("Smoke Simulator");
+    setWindowTitle("Fire Simulator");
 
     QVBoxLayout *layout = new QVBoxLayout;
 

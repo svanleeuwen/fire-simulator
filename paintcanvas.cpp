@@ -1,17 +1,22 @@
-#define FRAMERATE 10
-#define STEPS_PER_FRAME 2
+#define FRAMERATE 20
+#define STEPS_PER_FRAME 1
 
 #include <QtGui>
+#include <iostream>
+
 #include "paintcanvas.hpp"
 #include "colourUtil.hpp"
 
-#define MACSIZE 100
+#define MACSIZE 50
 #define SCALE 1.0f
+
+using std::cout;
+using std::endl;
 
 PaintCanvas::PaintCanvas(QWidget *parent) :
     QWidget(parent)
 {
-    m_mac = new MacGrid(MACSIZE, 1.0f / (FRAMERATE * STEPS_PER_FRAME), SCALE);
+    m_mac = new MacBox(MACSIZE, 1.0f / (FRAMERATE * STEPS_PER_FRAME), SCALE);
     m_img = QImage(width(), height(), QImage::Format_RGB32);
 
     m_updateTimer = new QTimer(this);
@@ -49,51 +54,7 @@ void PaintCanvas::refresh()
         m_mac->step();
     }
     m_img = QImage(width(), height(), QImage::Format_RGB32);
-
-    for(int i = 0; i < width(); ++i)
-    {
-        for(int j = 0; j < height(); ++j)
-        {
-            int grid_width = ceil(width() / (float)MACSIZE);
-            int grid_height = ceil(height() / (float)MACSIZE);
-
-            uint colour;
-
-            int a = i / grid_width;
-            int b = j / grid_height;
-
-            if(!m_mac->isFuel(a, b) && m_mac->getTemp(a, b) > IGNITION_TEMP)
-            {
-                colour = getBlackbodyRGB( m_mac->getTemp(
-                    i / grid_width,
-                    j / grid_height) * 2.0); 
-/*
-                int b = colour % 256;
-                int g = (colour >> 8) % 256;
-                int r = (colour >> 16) % 256;
-
-                colour = (b << 16) + (g << 8) + r;*/
-
-               /* *
-                    std::max(0.0f, m_mac->getDensity(
-                    i / grid_width,
-                    j / grid_height));*/
-            }
-            else if(!m_mac->isFuel(a, b))
-            {
-                colour = 255 * std::max(0.0f, m_mac->getDensity(
-                    i / grid_width,
-                    j / grid_height));
-                colour = colour + (colour << 8) + (colour << 16);
-            }
-            else
-            {
-                colour = 255;
-            }
-
-            m_img.setPixel(i, height() - j - 1, colour);
-        }
-    }
+    m_mac->computeImage(m_img);
 
     update();
 }

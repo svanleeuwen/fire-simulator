@@ -8,16 +8,16 @@
 #include <cfloat>
 #include <iostream>
 #include <stdlib.h>
+#include <thread>
 
 using std::cerr;
 using std::endl;
 using std::cout;
+using std::thread;
 
-LevelSet::LevelSet(int nx, int ny) :
-    Grid(nx, ny, FLT_MAX)
-{
-    m_dx = 1.0f / m_nx;
-}
+LevelSet::LevelSet(int res) :
+    Grid(res, FLT_MAX, 1.0f / res)
+{}
 
 void LevelSet::redistance()
 {
@@ -33,268 +33,334 @@ void LevelSet::redistance()
             }
         }
     }
+
+    resetGradients();
 }
 
 void LevelSet::addCircle(float radius,
-        Vector2f center,
-        vector< vector<bool> > *src)
+        Vector3f center,
+        vector< vector< vector<bool> > > *src)
 {
     for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
     {
         for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
         {
-
-            float dist = sqrt(pow((i-center[0]),2) 
-                        + pow((j-center[1]),2)) - radius;
-
-            if(dist < 0)
+            for(int k = PADDING_WIDTH; k < m_nz - PADDING_WIDTH;
+                    ++k)
             {
-                at(i)[j] = dist;
+                float dist = sqrt(pow((i-center[0]),2) 
+                        + pow((j-center[1]),2) 
+                        + pow((k-center[2]),2)) - radius;
 
-/*                Vector2f dir = {i-center[0], j-center[1]};
-                if(dir[0] != 0 || dir[1] != 0)
-                    dir.normalize();
-
-                dir *= 30;
-
-                vel.u_[i][j] = dir[0];
-                vel.v_[i][j] = dir[1];
-*/
-                if(src != NULL)
+                if(dist < 0)
                 {
-                    src->at(i)[j] = true;
+                    at(i)[j][k] = dist;
+
+                    if(src != NULL)
+                    {
+                        src->at(i)[j][k] = true;
+                    }
                 }
             }
         }
     }
 }
 
-void LevelSet::advect(float dt, VGrid &velocities, DGrid &burn)
+void LevelSet::advect(float dt, VGrid &v, DGrid &burn)
 {
-    int nx = m_nx - PADDING_WIDTH * 2;
-    int ny = m_ny - PADDING_WIDTH * 2;
+    int res = m_nx - PADDING_WIDTH * 2;
 
-    LevelSet update(nx, ny);
+    vector<Vector2i> bounds;
+    int bWidth = res / THREAD_COUNT;
 
+    for(int i = 0; i < THREAD_COUNT; ++i)
+    {
+        bounds.push_back(Vector2i(i*bWidth + PADDING_WIDTH, 
+                    (i+1)*bWidth + PADDING_WIDTH));
+    }
+    
+    bounds[THREAD_COUNT-1][1] = res + PADDING_WIDTH;
+
+    LevelSet update(res);
+    thread tt[THREAD_COUNT];
+
+    for(int i = 0; i < THREAD_COUNT; ++i)
+    {
+        tt[i] = thread(&LevelSet::advectHandler, this, 
+                std::ref(bounds[i]), std::ref(v), dt, 
+                std::ref(burn), std::ref(update));
+    }
+
+    for(int i = 0; i < THREAD_COUNT; ++i)
+    {
+        tt[i].join();
+    }
+    
+    *this = std::move(update);
+    resetGradients();
+}
+
+void LevelSet::advectHandler(Vector2i bounds, VGrid &v, 
+            float dt, DGrid &burn, LevelSet &update)
+{
+    for(int i = bounds[0]; i < bounds[1]; ++i) 
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
+        {
+            for(int k = PADDING_WIDTH; k < m_nz - PADDING_WIDTH;
+                    ++k)
+            {
+                Vector3f x_g(i, j, k);
+                Vector3f vel = v.getVelocity(x_g);
+
+                Vector3f x_p = v.rk3(x_g, vel, dt);
+                update[i][j][k] = 
+                    lerp(x_p) + dt * burn.lerp(x_p);
+            }
+        }
+    }
+}
+
+bool LevelSet::inFuelRegion(int i, int j, int k)
+{
+    Vector2i val = {-1, 1};
+    bool inRegion = at(i)[j][k] <= 0;
+
+    for(int ax = 0; ax < DIM; ++ax)
+    {
+        for(int b = 0; b < 2; ++b)
+        {
+            Vector3i index = {i, j, k};
+            index[ax] += val[b];
+
+            inRegion = inRegion || get(index) < 0;
+        }
+    }
+
+    return inRegion;
+}
+
+void LevelSet::updateMeanCurvature(DGrid &curvature)
+{
+    for(int ax = 0; ax < DIM; ++ax)
+    {
+        if(m_grad[ax] == NULL)
+        {
+            initGradient(Grid::Axis(ax));
+        }
+    }
+
+    // Adapted divergence calculation from Bridson p72
     for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
     {
         for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
         {
-            Vector2f x_g(i, j);
-            Vector2f vel = velocities.getVelocity(x_g);
-
-            Vector2f x_p = velocities.rk2(x_g, vel, dt);
-            update[i][j] = lerp(x_p) + dt * burn.lerp(x_p);
-            
-//            Vector2f n = getGradient(Vector2f(i, j));
-//            Vector2f uf = velocities.getVelocity(Vector2f(i, j));
-
-//            Vector2f w = uf + BURN_RATE * n;
-//            Vector2f phi = getUpwind(w, Vector2i(i, j));
-            
-//            update[i][j] = at(i)[j] + dt * w.dot(phi);
+            for(int k = PADDING_WIDTH; k < m_nz - PADDING_WIDTH;
+                    ++k)
+            {
+                Vector3f index(i, j, k);
+                curvature[i][j][k] = 
+                    -(m_grad[0]->getGradient(index, 
+                                Grid::Axis::X)
+                            + m_grad[1]->getGradient(index,
+                                Grid::Axis::Y)
+                            + m_grad[2]->getGradient(index,
+                                Grid::Axis::Z));
+            }
         }
     }
 
-    *this = std::move(update);
-}
-
-Vector2f LevelSet::getGradient(Vector2f x)
-{
-    return Vector2f(getGradientX(x), getGradientY(x));
-}
-
-float LevelSet::getGradientX(Vector2f x)
-{
-    int i = (int)(x[0] - 0.5f);
-    int j = (int)x[1];
-
-    float bl = (at(i+1)[j] - at(i)[j])/m_dx;
-    float br = (at(i+2)[j] - at(i+1)[j])/m_dx;
-    float tl = (at(i+1)[j+1] - at(i)[j+1])/m_dx;
-    float tr = (at(i+2)[j+1] - at(i+1)[j+1])/m_dx;
-
-    float s_x = x[0] - (i + 0.5f);
-    float s_y = x[1] - j;
-
-    return (1.0f - s_x) * (1.0f - s_y) * bl 
-        + s_x * (1.0f - s_y) * br 
-        + (1.0f - s_x) * s_y * tl 
-        + s_x * s_y * tr;
-}
-
-float LevelSet::getGradientY(Vector2f x)
-{
-    int i = (int)x[0];
-    int j = (int)(x[1] - 0.5f);
-
-    float bl = (at(i)[j+1] - at(i)[j])/m_dx;
-    float br = (at(i+1)[j+1] - at(i+1)[j])/m_dx;
-    float tl = (at(i)[j+2] - at(i)[j+1])/m_dx;
-    float tr = (at(i+1)[j+2] - at(i+1)[j+1])/m_dx;
-
-    float s_x = x[0] - i;
-    float s_y = x[1] - (j + 0.5f);
-    
-    return (1.0f - s_x) * (1.0f - s_y) * bl 
-        + s_x * (1.0f - s_y) * br 
-        + (1.0f - s_x) * s_y * tl 
-        + s_x * s_y * tr;
-
-}
-
-bool LevelSet::inFuelRegion(int i, int j)
-{
-    return (at(i)[j] <= 0 
-            || at(i-1)[j] < 0 
-            || at(i+1)[j] < 0 
-            || at(i)[j-1] < 0 
-            || at(i)[j+1] < 0);
+    curvature.resetGradients();
 }
 
 // This is suboptimal
 void LevelSet::redistanceAdjacent()
 {
-    LevelSet closest(m_nx - PADDING_WIDTH*2, 
-            m_ny - PADDING_WIDTH*2);
+    int res = m_nx - PADDING_WIDTH*2;
+    LevelSet closest(res); 
 
     for(int i = 0; i < m_nx; ++i)
     {
         for(int j = 0; j < m_ny; ++j)
         {
-            float dist = FLT_MAX;
-
-            float val = at(i)[j];
-            float sign = (val > 0.0f) ? 1.0f : -1.0f;
-            
-            if(i > 0)
+            for(int k = 0; k < m_nz; ++k)
             {
-                if(sign * at(i-1)[j] < 0)
-                {
-                    float theta = val / (val - at(i-1)[j]);
-                    dist = fmin(dist, theta * m_dx);
-                }
-            }
+                float dist = FLT_MAX;
 
-            if(j > 0)
-            {
-                if(sign * at(i)[j-1] < 0)
+                float val = at(i)[j][k];
+                float sign = (val > 0.0f) ? 1.0f : -1.0f;
+                
+                if(i > 0)
                 {
-                    float theta = val / (val - at(i)[j-1]);
-                    dist = fmin(dist, theta * m_dx);
+                    if(sign * at(i-1)[j][k] < 0)
+                    {
+                        float theta = val / 
+                            (val - at(i-1)[j][k]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
                 }
-            }
 
-            if(i < m_nx - 1)
-            {
-                if(sign * at(i+1)[j] < 0)
+                if(j > 0)
                 {
-                    float theta = val / (val - at(i+1)[j]);
-                    dist = fmin(dist, theta * m_dx);
+                    if(sign * at(i)[j-1][k] < 0)
+                    {
+                        float theta = val / 
+                            (val - at(i)[j-1][k]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
                 }
-            }
 
-            if(j < m_ny - 1)
-            {
-                if(sign * at(i)[j+1] < 0)
+                if(k > 0)
                 {
-                    float theta = val / (val - at(i)[j+1]);
-                    dist = fmin(dist, theta * m_dx);
+                    if(sign * at(i)[j][k-1] < 0)
+                    {
+                        float theta = val / 
+                            (val - at(i)[j][k-1]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
                 }
-            }
 
-            closest[i][j] = sign * dist;
+                if(i < m_nx - 1)
+                {
+                    if(sign * at(i+1)[j][k] < 0)
+                    {
+                        float theta = val /
+                           (val - at(i+1)[j][k]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
+                }
+
+                if(j < m_ny - 1)
+                {
+                    if(sign * at(i)[j+1][k] < 0)
+                    {
+                        float theta = val / 
+                            (val - at(i)[j+1][k]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
+                }
+
+                if(k < m_nz - 1)
+                {
+                    if(sign * at(i)[j][k+1] < 0)
+                    {
+                        float theta = val / 
+                            (val - at(i)[j][k+1]);
+                        dist = fmin(dist, theta * m_dx);
+                    }
+                }
+
+                closest[i][j][k] = sign * dist;
+            }
         }
     }
 
-    std::swap(*this, closest);
+    *this = std::move(closest);
 }
 
-static Vector2f sortDistances(Vector2f phi)
+static Vector3f sortDistances(Vector3f phi)
 {
-    if(phi[1] < phi[0])
+    bool flag = true;
+
+    while(flag)
     {
-        return Vector2f(phi[1], phi[0]);
+        flag = false;
+
+        for(int i = 0; i <=1; ++i)
+        {
+            if(phi[i+1] < phi[i])
+            {
+                flag = true;
+
+                float temp = phi[i];
+                phi[i] = phi[i+1];
+                phi[i+1] = temp;
+            }
+        }
     }
-    else
-    {
-        return phi;
-    }
+
+    return phi;
 }
 
 void LevelSet::sweep(bool increasing, Axis ax)
 {
+    int res = m_nx;
+
     for(int a = 0; a < m_nx; ++a)
     {
         for(int b = 0; b < m_ny; ++b)
         {
-            int i, j;
-            switch(ax)
+            for(int c = 0; c < m_nz; ++c)
             {
-                case X:
-                    i = (ax == X && !increasing) ? 
-                        m_nx - 1 - a : a;
-                    j = (ax == Y && !increasing) ? 
-                        m_ny - 1 - b : b;
-                    break;
+                int i, j, k;
+                switch(ax)
+                {
+                    case X:
+                        i = increasing ? a : res - 1 - a;
+                        j = b;
+                        k = c;
+                        break;
 
-                case Y:
-                    j = (ax == X && !increasing) ? 
-                        m_nx - 1 - a : a;
-                    i = (ax == Y && !increasing) ? 
-                        m_ny - 1 - b : b;
-                    break;
+                    case Y:
+                        i = b;
+                        j = increasing ? a : res - 1 - a;
+                        k = c;
+                        break;
 
-                default:
-                    cerr << "Unimplemented axis" << endl;
-                    exit(1);
-            }
+                    case Z:
+                        i = b;
+                        j = c;
+                        k = increasing ? a : res - 1 - a;
+                        break;
 
-            Vector2f phi;
-            float sign = (at(i)[j] > 0.0f) ? 1.0f : -1.0f;
+                    default:
+                        cerr << "Unimplemented axis" << endl;
+                        exit(1);
+                }
 
-            if(i == 0)
-            {
-                phi[0] = fabs(at(i+1)[j]);
-            }
-            else if(i == m_nx - 1)
-            {
-                phi[0] = fabs(at(i-1)[j]);
-            }
-            else
-            {
-                phi[0] = fmin(fabs(at(i-1)[j]), 
-                        fabs(at(i+1)[j]));
-            }
+                Vector3f phi;
+                float sign = (at(i)[j][k] > 0.0f) ? 1.0f : -1.0f;
 
-            if(j == 0)
-            {
-                phi[1] = fabs(at(i)[j+1]);
-            }
-            else if(j == m_nx - 1)
-            {
-                phi[1] = fabs(at(i)[j-1]);
-            }
-            else
-            {
-                phi[1] = fmin(fabs(at(i)[j-1]), 
-                        fabs(at(i)[j+1]));
-            }
+                Vector3i index(i, j, k);
+                for(int ax_it = 0; ax_it < DIM; ++ax_it)
+                {
+                    Vector3i less = index;
+                    less[ax_it] -= 1;
 
-            if(phi[0] == FLT_MAX && phi[1] == FLT_MAX)
-            {
-                continue;
-            }
+                    Vector3i more = index;
+                    more[ax_it] += 1;
 
-            phi = sortDistances(phi);
-            at(i)[j] = sign 
-                * fmin(fabs(at(i)[j]),updateDistance(phi));
+                    if(index[ax_it] == 0)
+                    {
+                        phi[ax_it] = fabs(get(more));
+                    }
+                    else if(index[ax_it] == res - 1)
+                    {
+                        phi[ax_it] = fabs(get(less));
+                    }
+                    else
+                    {
+                        phi[ax_it] = fmin(fabs(get(less)), 
+                                fabs(get(more)));
+                    }
+                }
+                
+                if(phi[0] == FLT_MAX && phi[1] == FLT_MAX
+                        && phi[2] == FLT_MAX)
+                {
+                    continue;
+                }
+
+                phi = sortDistances(phi);
+                at(i)[j][k] = sign *
+                    fmin(fabs(get(index)),updateDistance(phi));
+            }
         }
     }
 }
 
 // Figure 4.4 from p56 of Bridson
-float LevelSet::updateDistance(Vector2f phi)
+float LevelSet::updateDistance(Vector3f phi)
 {
     float d = phi[0] + m_dx;
 
@@ -303,35 +369,18 @@ float LevelSet::updateDistance(Vector2f phi)
         d = 0.5f * (phi[0] + phi[1] + 
                 sqrt(2.0f * m_dx * m_dx 
                     - pow(phi[1] - phi[0], 2.0f)));
+
+        if(d > phi[2])
+        {
+            d = (1.0f/3.0f) * (phi[0] + phi[1] + phi[2] +
+                    sqrt(fmax(0.0f,
+                            pow(phi[0] + phi[1] + phi[2], 2.0)
+                            - 3.0f * (phi[0] * phi[0]
+                                + phi[1] * phi[1]
+                                + phi[2] * phi[2]
+                                - m_dx * m_dx))));
+        }
     }
 
     return d;
-}
-
-Vector2f LevelSet::getUpwind(Vector2f w, Vector2i pos)
-{
-    Vector2f phi;
-
-    int i = pos[0];
-    int j = pos[1];
-
-    if(w[0] > 0)
-    {
-        phi[0] = (at(i)[j] - at(i-1)[j])/m_dx;
-    }
-    else
-    {
-        phi[0] = (at(i+1)[j] - at(i)[j])/m_dx;
-    }
-
-    if(w[1] > 0)
-    {
-        phi[0] = (at(i)[j] - at(i)[j-1])/m_dx;
-    }
-    else
-    {
-        phi[0] = (at(i)[j+1] - at(i)[j])/m_dx;
-    }
-
-    return phi;
 }

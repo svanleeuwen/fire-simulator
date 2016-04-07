@@ -4,7 +4,7 @@
 // From Nguyen 2002
 #define FLAME_DENSITY 0.01f // kg/m^3
 #define FUEL_DENSITY 1.0f // kg/m^3
-#define BURN_RATE 0.08f // m/s
+#define BURN_RATE 0.2f // m/s
 
 #include "s_grid.hpp"
 #include "t_grid.hpp"
@@ -26,14 +26,11 @@ public:
     MacGrid(int res, float dt, float scale);
 
     void step();
-    float getDensity(int i, int j);
-    bool isFuel(int i, int j);
-    float getTemp(int i, int j);
-
-    void testSolver();
+    float getDensity(int i, int j, int k);
+    bool isFuel(int i, int j, int k);
+    float getTemp(int i, int j, int k);
 
 private:
-    typedef vector< vector<float> > Mat;
     typedef Triplet<float> Trip;
 
     enum Material { Fire, Solid, Empty };
@@ -52,33 +49,26 @@ private:
     void applyBuoyancy();
     void applyVorticity();
    
-    float getOmega(int i, int j);
-    Vector2f getGrad(int i, int j, Grid &g);
-    float getGradX(int i, int j, Grid &g);
-    float getGradY(int i, int j, Grid &g);
+    Vector3f getOmega(int i, int j, int k);
 
 //*************** Projection *****************
     void project();
     
-    void addTriplets(const Mat &A_diag, const Mat &A_x, 
-            const Mat &A_y, vector<Trip> &trip);
-    void addEntries(Mat &A_diag, Mat &A_x, Mat &A_y, 
-            const Vector2i &g_point);
+    void addTriplets(vector<Trip> &trip);
     void buildSystem(SparseMatrix<double, Eigen::RowMajor> &sm,
             VectorXd &rhs);
 
-    float getCorrectedRhs(Vector2i pos);
+    float getCorrectedRhs(Vector3i pos);
     void updatePressure(const VectorXd &result);
     void applyPressure();
 
 //****************** DSD ********************
     void updateBurn();
-    void updateMeanCurvature();
-
 
 //**************** Variables ******************
     int m_nx;
     int m_ny;
+    int m_nz;
 
     float m_dt;
     float m_scale;
@@ -96,8 +86,7 @@ private:
     TGrid m_temp;
     SGrid m_soot;
 
-    vector< vector<Material> > m_mat;
-    vector< vector<bool> > m_src;
+    vector< vector< vector<bool> > > m_src;
 };
 
 #endif

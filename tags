@@ -4,13 +4,13 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-AIR_DENSITY	mac_grid.cpp	16;"	d	file:
-ALPHA	mac_grid.cpp	31;"	d	file:
+AIR_DENSITY	mac_grid.cpp	24;"	d	file:
+ALPHA	mac_grid.cpp	39;"	d	file:
 AMBIENT_TEMP	t_grid.hpp	4;"	d
 AR	Makefile	/^AR            = ar cqs$/;"	m
 AverageSpectrumSamples	spectrum.cpp	/^float AverageSpectrumSamples(const float *lambda, const float *vals, int n,$/;"	f
-Axis	grid.hpp	/^    enum Axis { X, Y };$/;"	g	class:Grid
-BETA	mac_grid.cpp	32;"	d	file:
+Axis	grid.hpp	/^    enum Axis { X, Y, Z };$/;"	g	class:Grid
+BETA	mac_grid.cpp	40;"	d	file:
 BURN_RATE	mac_grid.hpp	7;"	d
 Blackbody	spectrum.cpp	/^void Blackbody(const float *lambda, int n, float T, float *Le) {$/;"	f
 BlackbodyNormalized	spectrum.cpp	/^void BlackbodyNormalized(const float *lambda, int n, float T, float *Le) {$/;"	f
@@ -22,45 +22,47 @@ CIE_Y	spectrum.cpp	/^const float CIE_Y[nCIESamples] = {$/;"	v
 CIE_Y_integral	spectrum.hpp	/^static const float CIE_Y_integral = 106.856895;$/;"	v
 CIE_Z	spectrum.cpp	/^const float CIE_Z[nCIESamples] = {$/;"	v
 CIE_lambda	spectrum.cpp	/^const float CIE_lambda[nCIESamples] = {$/;"	v
+CIRCLE	mac_grid.cpp	1;"	d	file:
 COLOUR_UTIL_HPP	colourUtil.hpp	2;"	d
 COMPRESS	Makefile	/^COMPRESS      = gzip -9f$/;"	m
-COOLING_CONSTANT	t_grid.hpp	10;"	d
+COOLING_CONSTANT	t_grid.hpp	9;"	d
 COPY	Makefile	/^COPY          = cp -f$/;"	m
 COPY_DIR	Makefile	/^COPY_DIR      = cp -f -R$/;"	m
 COPY_FILE	Makefile	/^COPY_FILE     = cp -f$/;"	m
 CXX	Makefile	/^CXX           = g++$/;"	m
 CXXFLAGS	Makefile	/^CXXFLAGS      = -m64 -pipe -W -Wall -g -O2 -std=c++0x -Wall -W -D_REENTRANT -fPIE $(DEFINES)$/;"	m
-C_1	mac_grid.cpp	8;"	d	file:
-C_2	mac_grid.cpp	9;"	d	file:
-C_3	mac_grid.cpp	10;"	d	file:
-C_4	mac_grid.cpp	11;"	d	file:
-C_5_THETA	mac_grid.cpp	13;"	d	file:
-DCJ	mac_grid.cpp	7;"	d	file:
+C_1	mac_grid.cpp	16;"	d	file:
+C_2	mac_grid.cpp	17;"	d	file:
+C_3	mac_grid.cpp	18;"	d	file:
+C_4	mac_grid.cpp	19;"	d	file:
+C_5_THETA	mac_grid.cpp	21;"	d	file:
+DCJ	mac_grid.cpp	15;"	d	file:
 DEFINES	Makefile	/^DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB$/;"	m
 DEL_DIR	Makefile	/^DEL_DIR       = rmdir$/;"	m
 DEL_FILE	Makefile	/^DEL_FILE      = rm -f$/;"	m
 DESTDIR	Makefile	/^DESTDIR       = #avoid trailing-slash linebreak$/;"	m
-DGrid	d_grid.cpp	/^DGrid::DGrid(int nx, int ny, float ambient)$/;"	f	class:DGrid
+DGrid	d_grid.cpp	/^DGrid::DGrid(int res, float ambient, float dx)$/;"	f	class:DGrid
 DGrid	d_grid.hpp	/^class DGrid : public QGrid$/;"	c
 DIM	grid.hpp	6;"	d
 DIST	Makefile	/^DIST          = \/usr\/lib\/x86_64-linux-gnu\/qt5\/mkspecs\/features\/spec_pre.prf \\$/;"	m
-DSD	mac_grid.cpp	4;"	d	file:
 D_GRID_HPP	d_grid.hpp	2;"	d
 EPSILON	grid.hpp	4;"	d
 Empty	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGrid::Material
-FLAMETHROWERS	mac_grid.cpp	1;"	d	file:
 FLAME_DENSITY	mac_grid.hpp	5;"	d
 FRAMERATE	make_video.cpp	1;"	d	file:
 FRAMERATE	paintcanvas.cpp	1;"	d	file:
 FUEL_DENSITY	mac_grid.hpp	6;"	d
 Fire	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGrid::Material
-G	mac_grid.cpp	15;"	d	file:
+GRAVITY	mac_grid.cpp	23;"	d	file:
 GRID_HPP	grid.hpp	2;"	d
-Grid	grid.cpp	/^Grid::Grid(int nx, int ny, float ambient) :$/;"	f	class:Grid
-Grid	grid.hpp	/^class Grid : public vector< vector<float> >$/;"	c
+Grid	grid.cpp	/^Grid::Grid(int nx, int ny, int nz, float ambient, float dx) :$/;"	f	class:Grid
+Grid	grid.cpp	/^Grid::Grid(int res, float ambient, float dx) :$/;"	f	class:Grid
+Grid	grid.hpp	/^class Grid : public vector< vector< vector<float> > >$/;"	c
 IGNITION_TEMP	t_grid.hpp	7;"	d
-IMG_H	make_video.cpp	7;"	d	file:
-IMG_W	make_video.cpp	8;"	d	file:
+IGrid	d_grid.cpp	/^DGrid::IGrid::IGrid(int res, LevelSet &ls) :$/;"	f	class:DGrid::IGrid
+IGrid	d_grid.hpp	/^    class IGrid : public vector< vector< vector<int> > >$/;"	c	class:DGrid
+IMG_H	make_video.cpp	8;"	d	file:
+IMG_W	make_video.cpp	9;"	d	file:
 INCPATH	Makefile	/^INCPATH       = -I\/usr\/lib\/x86_64-linux-gnu\/qt5\/mkspecs\/linux-g++-64 -I. -I. -I\/usr\/include\/lua5.1 -I\/usr\/include\/qt5 -I\/usr\/include\/qt5\/QtWidgets -I\/usr\/include\/qt5\/QtGui -I\/usr\/include\/qt5\/QtCore -I.$/;"	m
 INSTALL_DIR	Makefile	/^INSTALL_DIR   = $(COPY_DIR)$/;"	m
 INSTALL_FILE	Makefile	/^INSTALL_FILE  = install -m 644 -p$/;"	m
@@ -71,20 +73,19 @@ LEVEL_SET_HPP	level_set.hpp	2;"	d
 LFLAGS	Makefile	/^LFLAGS        = -m64 -Wl,-O1$/;"	m
 LIBS	Makefile	/^LIBS          = $(SUBLIBS) -L\/usr\/X11R6\/lib64 -llua5.1 -lQt5Widgets -L\/usr\/lib\/x86_64-linux-gnu -lQt5Gui -lQt5Core -lGL -lpthread $/;"	m
 LINK	Makefile	/^LINK          = g++$/;"	m
-LevelSet	level_set.cpp	/^LevelSet::LevelSet(int nx, int ny) :$/;"	f	class:LevelSet
+LevelSet	level_set.cpp	/^LevelSet::LevelSet(int res) :$/;"	f	class:LevelSet
 LevelSet	level_set.hpp	/^class LevelSet : public Grid$/;"	c
 MACSIZE	make_video.cpp	5;"	d	file:
-MACSIZE	paintcanvas.cpp	8;"	d	file:
+MACSIZE	paintcanvas.cpp	10;"	d	file:
 MAC_GRID_HPP	mac_grid.hpp	2;"	d
 MAKEFILE	Makefile	/^MAKEFILE      = Makefile$/;"	m
-MAX_SOOT	s_grid.cpp	4;"	d	file:
+MAX_SOOT	s_grid.cpp	6;"	d	file:
 MAX_TEMP	t_grid.hpp	6;"	d
 MKDIR	Makefile	/^MKDIR         = mkdir -p$/;"	m
 MOVE	Makefile	/^MOVE          = mv -f$/;"	m
-MU_THETA	mac_grid.cpp	12;"	d	file:
-MacGrid	mac_grid.cpp	/^MacGrid::MacGrid(int res, float dt) :$/;"	f	class:MacGrid
+MU_THETA	mac_grid.cpp	20;"	d	file:
+MacGrid	mac_grid.cpp	/^MacGrid::MacGrid(int res, float dt, float scale) :$/;"	f	class:MacGrid
 MacGrid	mac_grid.hpp	/^class MacGrid {$/;"	c
-Mat	mac_grid.hpp	/^    typedef vector< vector<float> > Mat;$/;"	t	class:MacGrid
 Material	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	g	class:MacGrid
 OBJECTS	Makefile	/^OBJECTS       = main.o \\$/;"	m
 OBJECTS_DIR	Makefile	/^OBJECTS_DIR   = .\/$/;"	m
@@ -97,7 +98,7 @@ PaintCanvas	paintcanvas.cpp	/^PaintCanvas::PaintCanvas(QWidget *parent) :$/;"	f	
 PaintCanvas	paintcanvas.hpp	/^class PaintCanvas : public QWidget {$/;"	c
 PaintWindow	paintwindow.cpp	/^PaintWindow::PaintWindow() $/;"	f	class:PaintWindow
 PaintWindow	paintwindow.hpp	/^class PaintWindow : public QMainWindow$/;"	c
-QGrid	q_grid.cpp	/^QGrid::QGrid(int nx, int ny, float ambient) :$/;"	f	class:QGrid
+QGrid	q_grid.cpp	/^QGrid::QGrid(int res, float ambient, float dx) :$/;"	f	class:QGrid
 QGrid	q_grid.hpp	/^class QGrid : public Grid $/;"	c
 QMAKE	Makefile	/^QMAKE         = \/usr\/lib\/x86_64-linux-gnu\/qt5\/bin\/qmake$/;"	m
 QMAKE_TARGET	Makefile	/^QMAKE_TARGET  = fire$/;"	m
@@ -107,6 +108,7 @@ QT_MOC_LITERAL	moc_paintwindow.cpp	25;"	d	file:
 QT_MOC_LITERAL	moc_paintwindow.cpp	36;"	d	file:
 Q_GRID_HPP	q_grid.hpp	2;"	d
 RANLIB	Makefile	/^RANLIB        = $/;"	m
+RES	testAdvection.cpp	1;"	d	file:
 RGB2SpectLambda	spectrum.cpp	/^const float RGB2SpectLambda[nRGB2SpectSamples] = {$/;"	v
 RGBIllum2SpectBlue	spectrum.cpp	/^const float RGBIllum2SpectBlue[nRGB2SpectSamples] =  {$/;"	v
 RGBIllum2SpectCyan	spectrum.cpp	/^const float RGBIllum2SpectCyan[nRGB2SpectSamples] =  {$/;"	v
@@ -123,12 +125,14 @@ RGBRefl2SpectRed	spectrum.cpp	/^const float RGBRefl2SpectRed[nRGB2SpectSamples] 
 RGBRefl2SpectWhite	spectrum.cpp	/^const float RGBRefl2SpectWhite[nRGB2SpectSamples] =       {$/;"	v
 RGBRefl2SpectYellow	spectrum.cpp	/^const float RGBRefl2SpectYellow[nRGB2SpectSamples] =  {$/;"	v
 RGBToXYZ	spectrum.hpp	/^inline void RGBToXYZ(const float rgb[3], float xyz[3]) {$/;"	f
+SCALE	make_video.cpp	6;"	d	file:
+SCALE	paintcanvas.cpp	11;"	d	file:
 SED	Makefile	/^SED           = sed$/;"	m
-SGrid	s_grid.cpp	/^SGrid::SGrid(int nx, int ny, float ambient) :$/;"	f	class:SGrid
+SGrid	s_grid.cpp	/^SGrid::SGrid(int res, float ambient, float dx) :$/;"	f	class:SGrid
 SGrid	s_grid.hpp	/^class SGrid : public QGrid$/;"	c
 SIXTH	grid.cpp	2;"	d	file:
 SIZE	lvlsetTest.cpp	1;"	d	file:
-SOOT_DENSITY	mac_grid.cpp	28;"	d	file:
+SOOT_DENSITY	mac_grid.cpp	36;"	d	file:
 SOURCES	Makefile	/^SOURCES       = main.cpp \\$/;"	m
 STEPS_PER_FRAME	make_video.cpp	2;"	d	file:
 STEPS_PER_FRAME	paintcanvas.cpp	2;"	d	file:
@@ -140,29 +144,28 @@ Solid	mac_grid.hpp	/^    enum Material { Fire, Solid, Empty };$/;"	e	enum:MacGri
 SpectrumSamplesSorted	spectrum.cpp	/^bool SpectrumSamplesSorted(const float *lambda, const float *vals, int n) {$/;"	f
 TAR	Makefile	/^TAR           = tar -cf$/;"	m
 TARGET	Makefile	/^TARGET        = fire$/;"	m
-TGrid	t_grid.cpp	/^TGrid::TGrid(int nx, int ny, float ambient)$/;"	f	class:TGrid
+TGrid	t_grid.cpp	/^TGrid::TGrid(int res, float ambient, float dx)$/;"	f	class:TGrid
 TGrid	t_grid.hpp	/^class TGrid : public QGrid$/;"	c
 THIRD	grid.cpp	1;"	d	file:
 T_GRID_HPP	t_grid.hpp	2;"	d
 ToXYZ	colourUtil.cpp	/^void ToXYZ(int n, float *vals, float xyz[3]) $/;"	f
 Trip	mac_grid.hpp	/^    typedef Triplet<float> Trip;$/;"	t	class:MacGrid
-VGrid	v_grid.cpp	/^VGrid::VGrid(int nx, int ny, LevelSet *interface, DGrid *burn) :$/;"	f	class:VGrid
+VGrid	v_grid.cpp	/^VGrid::VGrid(int nx, int ny, int nz, float dx,$/;"	f	class:VGrid
 VGrid	v_grid.hpp	/^class VGrid$/;"	c
 VIENNACL_WITH_EIGEN	mac_grid.cpp	2;"	d	file:
-VORTICITY_EPS	mac_grid.cpp	34;"	d	file:
+VORTICITY_EPS	mac_grid.cpp	42;"	d	file:
 V_GRID_HPP	v_grid.hpp	2;"	d
 X	colourUtil.cpp	/^static float X[61];$/;"	v	file:
-X	grid.hpp	/^    enum Axis { X, Y };$/;"	e	enum:Grid::Axis
+X	grid.hpp	/^    enum Axis { X, Y, Z };$/;"	e	enum:Grid::Axis
 XYZToRGB	spectrum.hpp	/^inline void XYZToRGB(const float xyz[3], float rgb[3]) {$/;"	f
 Y	colourUtil.cpp	/^static float Y[61];$/;"	v	file:
-Y	grid.hpp	/^    enum Axis { X, Y };$/;"	e	enum:Grid::Axis
+Y	grid.hpp	/^    enum Axis { X, Y, Z };$/;"	e	enum:Grid::Axis
 Z	colourUtil.cpp	/^static float Z[61];$/;"	v	file:
+Z	grid.hpp	/^    enum Axis { X, Y, Z };$/;"	e	enum:Grid::Axis
 addCircle	level_set.cpp	/^void LevelSet::addCircle(float radius,$/;"	f	class:LevelSet
-addEntries	mac_grid.cpp	/^void MacGrid::addEntries(Mat &A_diag, Mat &A_x, Mat &A_y, $/;"	f	class:MacGrid
 addFuel	mac_grid.cpp	/^void MacGrid::addFuel()$/;"	f	class:MacGrid
-addSmoke	mac_grid.cpp	/^void MacGrid::addSmoke()$/;"	f	class:MacGrid
-addTriplets	mac_grid.cpp	/^void MacGrid::addTriplets(const Mat &A_diag, const Mat &A_x, $/;"	f	class:MacGrid
-adjacentZero	d_grid.cpp	/^bool DGrid::adjacentZero(int i, int j, Grid &dist)$/;"	f	class:DGrid
+addTriplets	mac_grid.cpp	/^void MacGrid::addTriplets(vector<Trip> &trip)$/;"	f	class:MacGrid
+adjacentZero	d_grid.cpp	/^bool DGrid::adjacentZero(int i, int j, int k, $/;"	f	class:DGrid
 advect	d_grid.cpp	/^void DGrid::advect(VGrid &v, float dt, LevelSet *ls)$/;"	f	class:DGrid
 advect	level_set.cpp	/^void LevelSet::advect(float dt, VGrid &velocities, DGrid &burn)$/;"	f	class:LevelSet
 advect	mac_grid.cpp	/^void MacGrid::advect() $/;"	f	class:MacGrid
@@ -171,44 +174,43 @@ advect	s_grid.cpp	/^void SGrid::advect(VGrid &v, float dt, LevelSet *ls)$/;"	f	c
 advect	t_grid.cpp	/^void TGrid::advect(VGrid &v, float dt, LevelSet *ls)$/;"	f	class:TGrid
 advect	v_grid.cpp	/^void VGrid::advect(float dt)$/;"	f	class:VGrid
 advect	v_grid.cpp	/^void VGrid::advect(float dt, Grid::Axis ax, Grid &ret)$/;"	f	class:VGrid
-advectingFlame	v_grid.hpp	/^    bool advectingFlame;$/;"	m	class:VGrid
 applyBuoyancy	mac_grid.cpp	/^void MacGrid::applyBuoyancy() $/;"	f	class:MacGrid
 applyForces	mac_grid.cpp	/^void MacGrid::applyForces()$/;"	f	class:MacGrid
-applyJumpConditions	v_grid.cpp	/^float VGrid::applyJumpConditions(Vector2i x, Grid::Axis ax,$/;"	f	class:VGrid
+applyJumpConditions	v_grid.cpp	/^float VGrid::applyJumpConditions(Vector3i index, Grid::Axis ax,$/;"	f	class:VGrid
 applyPressure	mac_grid.cpp	/^void MacGrid::applyPressure()$/;"	f	class:MacGrid
 applyVorticity	mac_grid.cpp	/^void MacGrid::applyVorticity()$/;"	f	class:MacGrid
 buildSystem	mac_grid.cpp	/^void MacGrid::buildSystem($/;"	f	class:MacGrid
-clampSoot	mac_grid.cpp	/^static void clampSoot(QGrid &soot, int nx, int ny)$/;"	f	file:
-clamp_pos	v_grid.cpp	/^Vector2f VGrid::clamp_pos(const Vector2f &pos)$/;"	f	class:VGrid
+clampSoot	mac_grid.cpp	/^static void clampSoot(QGrid &soot, int nx, int ny, int nz)$/;"	f	file:
+clamp_pos	v_grid.cpp	/^Vector3f VGrid::clamp_pos(const Vector3f &pos)$/;"	f	class:VGrid
 data	moc_paintcanvas.cpp	/^    QByteArrayData data[3];$/;"	m	struct:qt_meta_stringdata_PaintCanvas_t	file:
 data	moc_paintwindow.cpp	/^    QByteArrayData data[1];$/;"	m	struct:qt_meta_stringdata_PaintWindow_t	file:
 decay	t_grid.cpp	/^float TGrid::decay(float temp, float dt)$/;"	f	class:TGrid
 extrapolate	d_grid.cpp	/^void DGrid::extrapolate(LevelSet &ls)$/;"	f	class:DGrid
+get	d_grid.cpp	/^inline int DGrid::IGrid::get(Vector3i index)$/;"	f	class:DGrid::IGrid
+get	grid.cpp	/^float Grid::get(Vector3i index)$/;"	f	class:Grid
 getBlackbodyRGB	colourUtil.cpp	/^unsigned int getBlackbodyRGB(float temp)$/;"	f
-getCorrectedRhs	mac_grid.cpp	/^float MacGrid::getCorrectedRhs(Vector2i pos)$/;"	f	class:MacGrid
-getDensity	mac_grid.cpp	/^float MacGrid::getDensity(int i, int j)$/;"	f	class:MacGrid
-getGrad	mac_grid.cpp	/^Vector2f MacGrid::getGrad(int i, int j, Grid &g)$/;"	f	class:MacGrid
-getGradX	mac_grid.cpp	/^float MacGrid::getGradX(int i, int j, Grid &g)$/;"	f	class:MacGrid
-getGradY	mac_grid.cpp	/^float MacGrid::getGradY(int i, int j, Grid &g)$/;"	f	class:MacGrid
-getGradient	level_set.cpp	/^Vector2f LevelSet::getGradient(Vector2f x)$/;"	f	class:LevelSet
-getGradientX	level_set.cpp	/^float LevelSet::getGradientX(Vector2f x)$/;"	f	class:LevelSet
-getGradientY	level_set.cpp	/^float LevelSet::getGradientY(Vector2f x)$/;"	f	class:LevelSet
-getOmega	mac_grid.cpp	/^float MacGrid::getOmega(int i, int j)$/;"	f	class:MacGrid
-getQuantity	q_grid.cpp	/^float QGrid::getQuantity(const Vector2f &x)$/;"	f	class:QGrid
-getTemp	mac_grid.cpp	/^float MacGrid::getTemp(int i, int j)$/;"	f	class:MacGrid
-getUpwind	level_set.cpp	/^Vector2f LevelSet::getUpwind(Vector2f w, Vector2i pos)$/;"	f	class:LevelSet
-getValue	grid.cpp	/^float Grid::getValue(const Vector2i &x, const Vector2f &s) {$/;"	f	class:Grid
-getValue	v_grid.cpp	/^float VGrid::getValue(Grid &g, const Vector2i &x, $/;"	f	class:VGrid
-getVelocity	v_grid.cpp	/^Vector2f VGrid::getVelocity(const Vector2f &x, bool advecting)$/;"	f	class:VGrid
-getVelocityU	v_grid.cpp	/^float VGrid::getVelocityU(const Vector2f &x, bool advecting)$/;"	f	class:VGrid
-getVelocityV	v_grid.cpp	/^float VGrid::getVelocityV(const Vector2f &x, bool advecting)$/;"	f	class:VGrid
+getCorrectedRhs	mac_grid.cpp	/^float MacGrid::getCorrectedRhs(Vector3i pos)$/;"	f	class:MacGrid
+getDensity	mac_grid.cpp	/^float MacGrid::getDensity(int i, int j, int k)$/;"	f	class:MacGrid
+getGradient	grid.cpp	/^Vector3f Grid::getGradient(Vector3f x)$/;"	f	class:Grid
+getGradient	grid.cpp	/^float Grid::getGradient(Vector3f x, Axis ax)$/;"	f	class:Grid
+getGradient	v_grid.cpp	/^float VGrid::getGradient(Vector3f x, Grid::Axis ax)$/;"	f	class:VGrid
+getOmega	mac_grid.cpp	/^Vector3f MacGrid::getOmega(int i, int j, int k)$/;"	f	class:MacGrid
+getQuantity	q_grid.cpp	/^float QGrid::getQuantity(const Vector3f &x)$/;"	f	class:QGrid
+getTemp	mac_grid.cpp	/^float MacGrid::getTemp(int i, int j, int k)$/;"	f	class:MacGrid
+getValue	grid.cpp	/^float Grid::getValue(Vector3f x)$/;"	f	class:Grid
+getValue	grid.cpp	/^float Grid::getValue(const Vector3i &index, const Vector3f &s) $/;"	f	class:Grid
+getValue	v_grid.cpp	/^float VGrid::getValue(Grid &g, const Vector3i &index, $/;"	f	class:VGrid
+getVelocity	v_grid.cpp	/^Vector3f VGrid::getVelocity(const Vector3f &x, bool advecting)$/;"	f	class:VGrid
+getVelocity	v_grid.cpp	/^float VGrid::getVelocity(const Vector3f &x, Grid::Axis ax,$/;"	f	class:VGrid
 getW	grid.cpp	/^Vector4f Grid::getW(const Vector4f &q)$/;"	f	class:Grid
-inFuelRegion	level_set.cpp	/^bool LevelSet::inFuelRegion(int i, int j)$/;"	f	class:LevelSet
+inFuelRegion	level_set.cpp	/^bool LevelSet::inFuelRegion(int i, int j, int k)$/;"	f	class:LevelSet
 init	colourUtil.cpp	/^static void init()$/;"	f	file:
-isFuel	mac_grid.cpp	/^bool MacGrid::isFuel(int i, int j)$/;"	f	class:MacGrid
+initGradient	grid.cpp	/^void Grid::initGradient(Axis ax)$/;"	f	class:Grid
+isFuel	mac_grid.cpp	/^bool MacGrid::isFuel(int i, int j, int k)$/;"	f	class:MacGrid
 keyPressEvent	paintwindow.cpp	/^void PaintWindow::keyPressEvent(QKeyEvent *event) {$/;"	f	class:PaintWindow
-lerp	grid.cpp	/^float Grid::lerp(const Vector2f &x)$/;"	f	class:Grid
+lerp	grid.cpp	/^float Grid::lerp(Vector3f x)$/;"	f	class:Grid
 lerp	spectrum.hpp	/^    inline double lerp(double t, double s1, double s2)$/;"	f	namespace:spectrum
+m_advectingFlame	v_grid.hpp	/^    bool m_advectingFlame;$/;"	m	class:VGrid
 m_ambient	grid.hpp	/^    float m_ambient;$/;"	m	class:Grid
 m_burn	mac_grid.hpp	/^    DGrid m_burn;$/;"	m	class:MacGrid
 m_burn	v_grid.hpp	/^    DGrid *m_burn;$/;"	m	class:VGrid
@@ -216,28 +218,37 @@ m_canvas	paintwindow.hpp	/^    PaintCanvas* m_canvas;$/;"	m	class:PaintWindow
 m_curvature	mac_grid.hpp	/^    DGrid m_curvature;$/;"	m	class:MacGrid
 m_dburn	mac_grid.hpp	/^    DGrid m_dburn;$/;"	m	class:MacGrid
 m_dt	mac_grid.hpp	/^    float m_dt;$/;"	m	class:MacGrid
-m_dx	level_set.hpp	/^    float m_dx;$/;"	m	class:LevelSet
+m_dx	grid.hpp	/^    float m_dx;$/;"	m	class:Grid
 m_dx	mac_grid.hpp	/^    float m_dx;$/;"	m	class:MacGrid
+m_dx	v_grid.hpp	/^    float m_dx;$/;"	m	class:VGrid
+m_grad	grid.hpp	/^    Grid *m_grad [3];$/;"	m	class:Grid
 m_img	paintcanvas.hpp	/^    QImage m_img;$/;"	m	class:PaintCanvas
 m_interface	mac_grid.hpp	/^    LevelSet m_interface;$/;"	m	class:MacGrid
 m_interface	v_grid.hpp	/^    LevelSet *m_interface;$/;"	m	class:VGrid
 m_mac	paintcanvas.hpp	/^    MacGrid *m_mac;$/;"	m	class:PaintCanvas
-m_mat	mac_grid.hpp	/^    vector< vector<Material> > m_mat;$/;"	m	class:MacGrid
+m_nx	d_grid.hpp	/^        int m_nx;$/;"	m	class:DGrid::IGrid
 m_nx	grid.hpp	/^    int m_nx;$/;"	m	class:Grid
 m_nx	mac_grid.hpp	/^    int m_nx;$/;"	m	class:MacGrid
 m_nx	v_grid.hpp	/^    int m_nx;$/;"	m	class:VGrid
+m_ny	d_grid.hpp	/^        int m_ny;$/;"	m	class:DGrid::IGrid
 m_ny	grid.hpp	/^    int m_ny;$/;"	m	class:Grid
 m_ny	mac_grid.hpp	/^    int m_ny;$/;"	m	class:MacGrid
 m_ny	v_grid.hpp	/^    int m_ny;$/;"	m	class:VGrid
+m_nz	d_grid.hpp	/^        int m_nz;$/;"	m	class:DGrid::IGrid
+m_nz	grid.hpp	/^    int m_nz;$/;"	m	class:Grid
+m_nz	mac_grid.hpp	/^    int m_nz;$/;"	m	class:MacGrid
+m_nz	v_grid.hpp	/^    int m_nz;$/;"	m	class:VGrid
 m_press	mac_grid.hpp	/^    Grid m_press;$/;"	m	class:MacGrid
+m_scale	mac_grid.hpp	/^    float m_scale;$/;"	m	class:MacGrid
 m_soot	mac_grid.hpp	/^    SGrid m_soot;$/;"	m	class:MacGrid
-m_src	mac_grid.hpp	/^    vector< vector<bool> > m_src;$/;"	m	class:MacGrid
+m_src	mac_grid.hpp	/^    vector< vector< vector<bool> > > m_src;$/;"	m	class:MacGrid
 m_temp	mac_grid.hpp	/^    TGrid m_temp;$/;"	m	class:MacGrid
 m_updateTimer	paintcanvas.hpp	/^    QTimer *m_updateTimer;$/;"	m	class:PaintCanvas
 m_vel	mac_grid.hpp	/^    VGrid m_vel;$/;"	m	class:MacGrid
 main	lvlsetTest.cpp	/^int main()$/;"	f
 main	main.cpp	/^int main(int argc, char** argv) {$/;"	f
 main	make_video.cpp	/^int main(int argc, char **argv)$/;"	f
+main	testAdvection.cpp	/^int main()$/;"	f
 metaObject	moc_paintcanvas.cpp	/^const QMetaObject *PaintCanvas::metaObject() const$/;"	f	class:PaintCanvas
 metaObject	moc_paintwindow.cpp	/^const QMetaObject *PaintWindow::metaObject() const$/;"	f	class:PaintWindow
 minimumSizeHint	paintcanvas.cpp	/^QSize PaintCanvas::minimumSizeHint() const $/;"	f	class:PaintCanvas
@@ -264,14 +275,15 @@ qt_static_metacall	moc_paintwindow.cpp	/^void PaintWindow::qt_static_metacall(QO
 redistance	level_set.cpp	/^void LevelSet::redistance()$/;"	f	class:LevelSet
 redistanceAdjacent	level_set.cpp	/^void LevelSet::redistanceAdjacent()$/;"	f	class:LevelSet
 refresh	paintcanvas.cpp	/^void PaintCanvas::refresh()$/;"	f	class:PaintCanvas
-rk2	v_grid.cpp	/^Vector2f VGrid::rk2(const Vector2f &x_g, const Vector2f &vel,$/;"	f	class:VGrid
-rk3	v_grid.cpp	/^Vector2f VGrid::rk3(const Vector2f &x_g, const Vector2f &vel,$/;"	f	class:VGrid
+resetGradients	grid.cpp	/^void Grid::resetGradients()$/;"	f	class:Grid
+rk3	v_grid.cpp	/^Vector3f VGrid::rk3(const Vector3f &x_g, const Vector3f &vel,$/;"	f	class:VGrid
 sampledLambdaEnd	spectrum.hpp	/^static const int sampledLambdaEnd = 700;$/;"	v
 sampledLambdaStart	spectrum.hpp	/^static const int sampledLambdaStart = 400;$/;"	v
+set	d_grid.cpp	/^inline void DGrid::IGrid::set(Vector3i index, int val)$/;"	f	class:DGrid::IGrid
 setTestValues	mac_grid.cpp	/^void MacGrid::setTestValues()$/;"	f	class:MacGrid
 sizeHint	paintcanvas.cpp	/^QSize PaintCanvas::sizeHint() const $/;"	f	class:PaintCanvas
-solveSystem	mac_grid.cpp	/^void MacGrid::solveSystem($/;"	f	class:MacGrid
-sortDistances	level_set.cpp	/^static Vector2f sortDistances(Vector2f phi)$/;"	f	file:
+solveSystem	mac_grid.cpp	/^static void solveSystem($/;"	f	file:
+sortDistances	level_set.cpp	/^static Vector3f sortDistances(Vector3f phi)$/;"	f	file:
 spectrum	spectrum.hpp	/^namespace spectrum$/;"	n
 staticMetaObject	moc_paintcanvas.cpp	/^const QMetaObject PaintCanvas::staticMetaObject = {$/;"	m	class:PaintCanvas	file:
 staticMetaObject	moc_paintwindow.cpp	/^const QMetaObject PaintWindow::staticMetaObject = {$/;"	m	class:PaintWindow	file:
@@ -279,12 +291,13 @@ step	mac_grid.cpp	/^void MacGrid::step() $/;"	f	class:MacGrid
 stringdata	moc_paintcanvas.cpp	/^    char stringdata[22];$/;"	m	struct:qt_meta_stringdata_PaintCanvas_t	file:
 stringdata	moc_paintwindow.cpp	/^    char stringdata[13];$/;"	m	struct:qt_meta_stringdata_PaintWindow_t	file:
 sweep	level_set.cpp	/^void LevelSet::sweep(bool increasing, Axis ax)$/;"	f	class:LevelSet
-testSolver	mac_grid.cpp	/^void MacGrid::testSolver()$/;"	f	class:MacGrid
 u_	v_grid.hpp	/^    Grid u_;$/;"	m	class:VGrid
 updateBurn	mac_grid.cpp	/^void MacGrid::updateBurn()$/;"	f	class:MacGrid
-updateDistance	level_set.cpp	/^float LevelSet::updateDistance(Vector2f phi)$/;"	f	class:LevelSet
-updateMeanCurvature	mac_grid.cpp	/^void MacGrid::updateMeanCurvature()$/;"	f	class:MacGrid
+updateDistance	level_set.cpp	/^float LevelSet::updateDistance(Vector3f phi)$/;"	f	class:LevelSet
+updateMeanCurvature	level_set.cpp	/^void LevelSet::updateMeanCurvature(DGrid &curvature)$/;"	f	class:LevelSet
 updatePressure	mac_grid.cpp	/^void MacGrid::updatePressure(const VectorXd &result)$/;"	f	class:MacGrid
 v_	v_grid.hpp	/^    Grid v_;$/;"	m	class:VGrid
+w_	v_grid.hpp	/^    Grid w_;$/;"	m	class:VGrid
+~Grid	grid.cpp	/^Grid::~Grid()$/;"	f	class:Grid
 ~PaintCanvas	paintcanvas.cpp	/^PaintCanvas::~PaintCanvas() $/;"	f	class:PaintCanvas
 ~PaintWindow	paintwindow.hpp	/^    virtual ~PaintWindow() {}$/;"	f	class:PaintWindow

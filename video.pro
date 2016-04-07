@@ -11,5 +11,5 @@ INCLUDEPATH += . "/usr/include/lua5.1"
 LIBS += -llua5.1
 
 # Input
-HEADERS += grid.hpp v_grid.hpp q_grid.hpp mac_grid.hpp level_set.hpp t_grid.hpp spectrum.hpp colourUtil.hpp s_grid.hpp d_grid.hpp
-SOURCES += grid.cpp v_grid.cpp q_grid.cpp mac_grid.cpp level_set.cpp t_grid.cpp spectrum.cpp colourUtil.cpp make_video.cpp s_grid.cpp d_grid.cpp
+HEADERS += grid.hpp v_grid.hpp q_grid.hpp mac_grid.hpp level_set.hpp t_grid.hpp spectrum.hpp colourUtil.hpp s_grid.hpp d_grid.hpp mac_box.hpp ray.hpp
+SOURCES += grid.cpp v_grid.cpp q_grid.cpp mac_grid.cpp level_set.cpp t_grid.cpp spectrum.cpp colourUtil.cpp make_video.cpp s_grid.cpp d_grid.cpp mac_box.cpp ray.cpp

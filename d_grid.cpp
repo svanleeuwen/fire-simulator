@@ -5,14 +5,18 @@
 #include <queue>
 
 #include <climits>
+#include <thread>
 
 using std::cout;
 using std::cerr;
 using std::endl;
 using std::queue;
 
-DGrid::DGrid(int nx, int ny, float ambient)
-    : QGrid(nx, ny, ambient)
+using Eigen::Vector2i;
+using std::thread;
+
+DGrid::DGrid(int res, float ambient, float dx)
+    : QGrid(res, ambient, dx)
 {}
 
 void DGrid::advect(VGrid &v, float dt, LevelSet *ls)
@@ -23,83 +27,109 @@ void DGrid::advect(VGrid &v, float dt, LevelSet *ls)
         exit(1);
     }
 
-    int nx = m_nx - PADDING_WIDTH * 2;
-    int ny = m_ny - PADDING_WIDTH * 2;
+    int res = m_nx - PADDING_WIDTH * 2;
 
-    DGrid update(nx, ny, m_ambient);
+    vector<Vector2i> bounds;
+    int bWidth = res / THREAD_COUNT;
 
-    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i) 
+    for(int i = 0; i < THREAD_COUNT; ++i)
     {
-        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j) 
-        {
-            if(ls->inFuelRegion(i, j))
-            {
-                Vector2f x_g(i, j);
-                Vector2f vel = v.getVelocity(x_g);
+        bounds.push_back(Vector2i(i*bWidth + PADDING_WIDTH, 
+                    (i+1)*bWidth + PADDING_WIDTH));
+    }
+    
+    bounds[THREAD_COUNT-1][1] = res + PADDING_WIDTH;
 
-                Vector2f x_p = v.rk2(x_g, vel, dt);
-                update[i][j] = getQuantity(x_p);
+    DGrid update(res, m_ambient, m_dx);
+    thread tt[THREAD_COUNT];
+
+    for(int i = 0; i < THREAD_COUNT; ++i)
+    {
+        tt[i] = thread(&DGrid::advectHandler, this, 
+                std::ref(bounds[i]), std::ref(v), dt, 
+                ls, std::ref(update));
+    }
+
+    for(int i = 0; i < THREAD_COUNT; ++i)
+    {
+        tt[i].join();
+    }
+    
+    *this = std::move(update);
+    resetGradients();
+}
+
+void DGrid::advectHandler(Vector2i bounds, VGrid &v, 
+            float dt, LevelSet *ls, DGrid &update)
+{
+    for(int i = bounds[0]; i < bounds[1]; ++i) 
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
+        {
+            for(int k = PADDING_WIDTH; k < m_nz - PADDING_WIDTH;
+                    ++k)
+            {
+                if(ls->inFuelRegion(i, j, k))
+                {
+                    Vector3f x_g(i, j, k);
+                    Vector3f vel = v.getVelocity(x_g);
+
+                    Vector3f x_p = v.rk3(x_g, vel, dt);
+                    update[i][j][k] = getQuantity(x_p);
+                }
             }
         }
     }
-
-    *this = std::move(update);
 }
 
-bool DGrid::adjacentZero(int i, int j, vector<vector<int>> &dist)
-{
-    return (i > 0 && dist[i-1][j] == 0)
-        || (i < m_nx - 1 && dist[i+1][j] == 0)
-        || (j > 0 && dist[i][j-1] == 0)
-        || (j < m_ny - 1 && dist[i][j+1] == 0);
-}
 
-static void printDist(vector<vector<int>> &grid)
+bool DGrid::adjacentZero(int i, int j, int k, 
+        IGrid &dist)
 {
-    for(int j = grid[0].size() - 1; j >= 0; --j) 
+    Vector3i index(i, j, k);
+    Vector2i shift(-1, 1);
+
+    bool adjacent = false;
+    int res = m_nx;
+
+    for(int ax = 0; ax < DIM; ++ax)
     {
-        for(uint i = 0; i < grid.size(); ++i) 
-        {
-            cout << grid[i][j] << ", ";
-        }
+        Vector3i less = index;
+        less[ax] -= 1;
+        Vector3i more = index;
+        more[ax] += 1;
 
-        cout << endl;
+        adjacent = adjacent ||
+            (index[ax] > 0 && 
+             dist.get(less) == 0) ||
+            (index[ax] < res - 1 && 
+             dist.get(more) == 0);
     }
+
+    return adjacent;
 }
 
 // Extrapolation algorithm from p65 of Bridson
 void DGrid::extrapolate(LevelSet &ls)
 {
-    vector<vector<int>> dist;
-    dist.resize(m_nx);
+    int res = m_nx;
+    IGrid dist(res, ls);
 
-    for(int i = 0; i < m_nx; ++i) 
-    {
-        dist[i].resize(m_ny, INT_MAX);
-    }
-
-    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
-    {
-        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH; ++j)
-        {
-            if(ls.inFuelRegion(i, j))
-            {
-                dist[i][j] = 0;
-            }
-        }
-    }
-
-    queue<Vector2i> wavefront;
+    queue<Vector3i> wavefront;
 
     // Initialize first wavefront
     for(int i = 0; i < m_nx; ++i) 
     {
         for(int j = 0; j < m_ny; ++j) 
         {
-            if(dist[i][j] != 0 && adjacentZero(i, j, dist))
+            for(int k = 0; k < m_nz; ++k)
             {
-                dist[i][j] = 1;
-                wavefront.push(Vector2i(i, j));
+                if(dist[i][j][k] != 0 && 
+                        adjacentZero(i, j, k, dist))
+                {
+                    dist[i][j][k] = 1;
+                    wavefront.push(Vector3i(i, j, k));
+                }
             }
         }
     }
@@ -107,57 +137,96 @@ void DGrid::extrapolate(LevelSet &ls)
     // Main loop
     while(wavefront.size() > 0)
     {
-        int i = wavefront.front()[0];
-        int j = wavefront.front()[1];
+        Vector3i index = wavefront.front();
         wavefront.pop();
 
         float sum = 0.0f;
         int total = 0;
 
-        if(i > 0 && dist[i-1][j] < dist[i][j])
+        for(int ax = 0; ax < DIM; ++ax)
         {
-            sum += at(i-1)[j];
-            ++total;
-        }
-        else if(i > 0 && dist[i-1][j] == INT_MAX)
-        {
-            dist[i-1][j] = dist[i][j] + 1;
-            wavefront.push(Vector2i(i-1, j));
-        }
+            Vector3i less = index;
+            less[ax] -= 1;
+            Vector3i more = index;
+            more[ax] += 1;
 
-        if(i < m_nx - 1 && dist[i+1][j] < dist[i][j])
-        {
-            sum += at(i+1)[j];
-            ++total;
-        }
-        else if(i < m_nx - 1 && dist[i+1][j] == INT_MAX)
-        {
-            dist[i+1][j] = dist[i][j] + 1;
-            wavefront.push(Vector2i(i+1, j));
-        }
+            if(index[ax] > 0 && dist.get(less) < dist.get(index))
+            {
+                sum += get(less);
+                ++total;
+            }
+            else if(index[ax] > 0 && dist.get(less) == INT_MAX)
+            {
+                dist.set(less, dist.get(index) + 1);
+                wavefront.push(less);
+            }
 
-        if(j > 0 && dist[i][j-1] < dist[i][j])
-        {
-            sum += at(i)[j-1];
-            ++total;
-        }
-        else if(j > 0 && dist[i][j-1] == INT_MAX)
-        {
-            dist[i][j-1] = dist[i][j] + 1;
-            wavefront.push(Vector2i(i, j-1));
-        }
+            if(index[ax] < res - 1 && 
+                    dist.get(more) < dist.get(index))
+            {
+                sum += get(more);
+                ++total;
+            }
+            else if(index[ax] < res - 1 && 
+                    dist.get(more) == INT_MAX)
+            {
+                dist.set(more, dist.get(index) + 1);
+                wavefront.push(more);
+            }
 
-        if(j < m_ny - 1 && dist[i][j+1] < dist[i][j])
-        {
-            sum += at(i)[j+1];
-            ++total;
         }
-        else if(j < m_ny - 1 && dist[i][j+1] == INT_MAX)
-        {
-            dist[i][j+1] = dist[i][j] + 1;
-            wavefront.push(Vector2i(i, j+1));
-        }
+       
+        int i = index[0];
+        int j = index[1];
+        int k = index[2];
 
-        at(i)[j] = sum / (float)total;
+        at(i)[j][k] = sum / (float)total;
     }
+
+    resetGradients();
+}
+
+DGrid::IGrid::IGrid(int res, LevelSet &ls) :
+    m_nx(res),
+    m_ny(res),
+    m_nz(res)
+{
+    resize(m_nx);
+
+    for(int i = 0; i < m_nx; ++i) 
+    {
+        at(i).resize(m_ny);
+
+        for(int j = 0; j < m_ny; ++j)
+        {
+            at(i)[j].resize(m_nz, INT_MAX);
+        }
+    }
+
+
+    for(int i = PADDING_WIDTH; i < m_nx - PADDING_WIDTH; ++i)
+    {
+        for(int j = PADDING_WIDTH; j < m_ny - PADDING_WIDTH;
+                ++j)
+        {
+            for(int k = PADDING_WIDTH;
+                    k < m_nz - PADDING_WIDTH; ++k)
+            {
+                if(ls.inFuelRegion(i, j, k))
+                {
+                    at(i)[j][k] = 0;
+                }
+            }
+        }
+    }
+}
+
+inline int DGrid::IGrid::get(Vector3i index)
+{
+    return at(index[0])[index[1]][index[2]];
+}
+
+inline void DGrid::IGrid::set(Vector3i index, int val)
+{
+    at(index[0])[index[1]][index[2]] = val;
 }

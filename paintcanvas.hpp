@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QPainter>
 
-#include "mac_grid.hpp"
+#include "mac_box.hpp"
 
 class PaintCanvas : public QWidget {
 
@@ -22,7 +22,7 @@ protected:
     virtual void paintEvent(QPaintEvent* event);
 
 private:
-    MacGrid *m_mac;
+    MacBox *m_mac;
     
     QTimer *m_updateTimer;
     QImage m_img;
