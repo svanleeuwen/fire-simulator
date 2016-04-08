@@ -22,7 +22,7 @@
 #define C_3 1
 #define C_4 0
 #define MU_THETA 0.1
-#define C_5_THETA 0.5
+#define C_5_THETA 150
 
 #define BURN_RATE DCJ
 
@@ -774,7 +774,7 @@ void MacGrid::updateBurn()
 
                     float delta = m_burn[i][j][k] - DCJ;
                     float alpha = exp(MU_THETA * delta);
-                    float lcj = log(fabs(1 + C_5_THETA * 
+                    float lcj = log(fabs(1 + C_5_THETA * m_dx *
                                 m_curvature[i][j][k] / alpha));
 
                     float ddburn = -C_1 * alpha * alpha * delta 
