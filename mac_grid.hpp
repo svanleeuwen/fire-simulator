@@ -35,6 +35,10 @@ private:
     enum Material { Fire, Solid, Empty };
 
 //************** Testing ******************
+    inline float scaleVal(float val)
+    {
+        return ((val / 150.0f) / (m_dx * m_scale));
+    }
     void setTestValues();
     void addSmoke();
     void addFuel();

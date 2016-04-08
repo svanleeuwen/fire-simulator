@@ -159,15 +159,18 @@ void MacGrid::setTestValues()
 #endif
 
 #ifdef CIRCLE
-    m_interface.addCircle((8.0f/100.0f)/(m_dx * m_scale), 
+/*    m_interface.addCircle((8.0f/100.0f)/(m_dx * m_scale), 
             Vector3f(m_nx/2.0f, (15/100.0f)/(m_dx * m_scale),
-                m_nz/2.0f), &m_src);
+                m_nz/2.0f), &m_src);*/
 
-/*    for(int i = PADDING_WIDTH + 24; i < m_nx - PADDING_WIDTH - 24; i += 16)
+    for(int i = PADDING_WIDTH + (int)scaleVal(24); 
+            i < m_nx - PADDING_WIDTH - (int)scaleVal(24); 
+            i += (int)scaleVal(16))
     {
-        m_interface.addCircle(4.0f, Vector2f(i, 15), 
+        m_interface.addCircle(scaleVal(4.0f), 
+                Vector3f(i, scaleVal(15), m_nz/2.0f), 
                 &m_src);
-    }*/
+    }
 #endif
 
     addFuel();
@@ -260,13 +263,17 @@ void MacGrid::addSmoke()
 void MacGrid::addFuel()
 {
 #ifdef CIRCLE
-/*    for(int i = PADDING_WIDTH + 24; i < m_nx - PADDING_WIDTH - 24; i += 16)
+    for(int i = PADDING_WIDTH + (int)scaleVal(24); 
+            i < m_nx - PADDING_WIDTH - (int)scaleVal(24); 
+            i += (int)scaleVal(16))
     {
-        m_interface.addCircle(4.0f, Vector2f(i, 15));
-    }*/
-    m_interface.addCircle((8.0f/100.0f)/(m_dx * m_scale), 
+        m_interface.addCircle(scaleVal(4.0f), 
+                Vector3f(i, scaleVal(15), m_nz/2.0f));
+    }
+
+/*    m_interface.addCircle((8.0f/100.0f)/(m_dx * m_scale), 
         Vector3f(m_nx/2.0f, (15/100.0f)/(m_dx * m_scale),
-            m_nz/2.0f));
+            m_nz/2.0f));*/
 /*    
     m_interface.addCircle(4.0f, 
             Vector2f(m_nx/2.0f + 20, 15));
