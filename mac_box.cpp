@@ -129,14 +129,14 @@ uint MacBox::traceSample(const Ray &r)
         if(trans[2] > 1.66f)
             return 0;
 
-        if(!m_mac->isFuel(i, j, k) && 
+/*        if(!m_mac->isFuel(i, j, k) && 
                 m_mac->getTemp(i, j, k) > IGNITION_TEMP &&
                 m_mac->getDensity(i, j, k) > EPSILON)
         {
             return getBlackbodyRGB(m_mac->getTemp(i, j, k) * 
                     2.0); 
         }
-        else if(m_mac->isFuel(i, j, k))
+        else */if(m_mac->isFuel(i, j, k))
         {
             return 255;
         }

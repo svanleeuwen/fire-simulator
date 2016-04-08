@@ -4,7 +4,6 @@
 // From Nguyen 2002
 #define FLAME_DENSITY 0.01f // kg/m^3
 #define FUEL_DENSITY 1.0f // kg/m^3
-#define BURN_RATE 0.2f // m/s
 
 #include "s_grid.hpp"
 #include "t_grid.hpp"

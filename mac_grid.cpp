@@ -1,6 +1,8 @@
 #define CIRCLE
 #define VIENNACL_WITH_EIGEN
 
+#define DSD
+
 // Constants defined in Hong's paper
 /*
 #define DCJ 0.2
@@ -12,13 +14,23 @@
 #define C_5_THETA 2.5
 */
 
-#define DCJ 0.01
-#define C_1 0.1
-#define C_2 0.01
-#define C_3 0.1
+#ifdef DSD
+
+#define DCJ 0.5
+#define C_1 0.3
+#define C_2 0.1
+#define C_3 1
 #define C_4 0
-#define MU_THETA 0.01
+#define MU_THETA 0.1
 #define C_5_THETA 0.5
+
+#define BURN_RATE DCJ
+
+#else
+
+#define BURN_RATE 0.2
+
+#endif
 
 #define GRAVITY -9.81f
 #define AIR_DENSITY 1.3f // kg/m^3

@@ -115,7 +115,7 @@ void LevelSet::advectHandler(Vector2i bounds, VGrid &v,
 
                 Vector3f x_p = v.rk3(x_g, vel, dt);
                 update[i][j][k] = 
-                    lerp(x_p) + dt * burn.lerp(x_p);
+                    getValue(x_p) + dt * burn.getValue(x_p);
             }
         }
     }
