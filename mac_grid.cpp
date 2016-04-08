@@ -1,7 +1,5 @@
-#define CIRCLE
+#define FLAMETHROWERS
 #define VIENNACL_WITH_EIGEN
-
-#define DSD
 
 // Constants defined in Hong's paper
 /*
@@ -14,7 +12,10 @@
 #define C_5_THETA 2.5
 */
 
-#ifdef DSD
+#ifndef DSD
+#define BURN_RATE 0.2
+
+#else
 
 #define DCJ 0.5
 #define C_1 0.3
@@ -25,10 +26,6 @@
 #define C_5_THETA 150
 
 #define BURN_RATE DCJ
-
-#else
-
-#define BURN_RATE 0.2
 
 #endif
 
@@ -156,18 +153,9 @@ void MacGrid::setTestValues()
     }
 
 #ifdef FLAMETHROWERS
-    for(int i = PADDING_WIDTH + 3; 
-            i < PADDING_WIDTH + 8; ++i)
-    {
-        for(int j = PADDING_WIDTH + 40; 
-                j < PADDING_WIDTH + 50; ++j)
-        {
-            for(int k = m_nx / 2 - 10; k < m_nx / 2 + 10; ++k)
-            {
-                m_src[i][j] = true;
-            }
-        }
-    }
+    m_interface.addCircle((8.0f/150.0f)/(m_dx * m_scale), 
+            Vector3f((15/100.0f)/(m_dx * m_scale), m_ny/4.0f,
+                m_nz/2.0f), &m_src);
 #endif
 
 #ifdef CIRCLE
@@ -297,7 +285,9 @@ void MacGrid::addFuel()
                 {
                     m_burn[i][j][k] = BURN_RATE;
 #ifdef FLAMETHROWERS
-                    m_interface.at(i)[j][k] = -1;
+                    m_interface.addCircle((8.0f/150.0f)/(m_dx * m_scale), 
+                            Vector3f((15/150.0f)/(m_dx * m_scale), m_ny/4.0f,
+                                m_nz/2.0f));
 
                     if(i < (int)(m_nx / 2.0))
                     {
