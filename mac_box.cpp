@@ -164,8 +164,7 @@ Vector3f MacBox::next(Ray r)
         float sign = r.m_dir[ax] < 0 ? -1.0f : 1.0f;
         float next = ((index[ax] + sign) * m_dx - offset[ax]);
 
-        float dist = (next - r.m_origin[ax]) / r.m_dir[ax] +
-            1.0e-6;
+        float dist = (next - r.m_origin[ax] + m_dx / 2.0f) / r.m_dir[ax];
 
         minDist = fmin(dist, minDist);
     }

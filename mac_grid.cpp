@@ -1,4 +1,4 @@
-#define FLAMETHROWERS
+#define CIRCLE 
 #define VIENNACL_WITH_EIGEN
 
 // Constants defined in Hong's paper
