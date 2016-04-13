@@ -7,7 +7,7 @@
 #include "paintcanvas.hpp"
 #include "colourUtil.hpp"
 
-#define MACSIZE 50
+#define MACSIZE 150
 #define SCALE 1.0f
 
 using std::cout;
